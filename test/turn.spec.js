@@ -34,7 +34,7 @@ test('Turn', (t) => {
   ], 'bikes should move on the board')
   t.deepEqual(nextTurn.bikes, [
     { i: 0, j: 0, dir: C.UP },
-    { i: 2, j: 1, dir: C.lEFT }
+    { i: 2, j: 1, dir: C.LEFT }
   ], 'bike position and direction should update')
   t.deepEqual(nextTurn.inputs, [null, null], 'a new turns inputs should be null')
   t.end()
