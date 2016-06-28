@@ -17,6 +17,7 @@ class Turn {
     var nt = new Turn(this.board, this.bikes, this.inputs)
     for (let i = 0; i < this.bikes.length; i++) {
       const bike = nt.bikes[i]
+      if (bike.alive === false) continue
       let direction = this.inputs[i]
       if (direction == null) direction = this.bikes[i].dir
       else direction = writeDirection(bike.dir, direction)
@@ -47,6 +48,7 @@ class Turn {
         bike.alive = false
       }
     }
+    // Cleaning dead bikes
     for (let i = 0; i < nt.board.length; i++) {
       for (let j = 0; j < nt.board[i].length; j++) {
         let owner = tile(nt.board, i, j)
