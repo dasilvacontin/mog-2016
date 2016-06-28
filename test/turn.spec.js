@@ -170,4 +170,30 @@ test('Turn :: Dying with a tron that is dying at the same turn', (t) => {
   ])
   t.end()
 })
+
+test('Turn :: Not cutting other trons', (t) => {
+  const board = [
+    [1, 1, 1],
+    [2, 2, 1],
+    [0, 1, 1]
+  ]
+  const bikes = [
+    { i: 2, j: 1, dir: C.LEFT, alive: true },
+    { i: 1, j: 1, dir: C.RIGHT, alive: true }
+  ]
+  const inputs = [null, null]
+  const turn = new Turn(board, bikes, inputs)
+
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [1, 1, 1],
+    [0, 0, 1],
+    [1, 1, 1]
+  ], 'the dead bike should not override the alive bike')
+  t.deepEqual(nextTurn.bikes, [
+    { i: 2, j: 0, dir: C.LEFT, alive: true },
+    { i: 1, j: 2, dir: C.RIGHT, alive: false }
+  ])
+  t.end()
+})
 // const alivePlayers = players.filter(player => player.isAlive())
