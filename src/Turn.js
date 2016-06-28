@@ -8,40 +8,79 @@ class Turn {
   setInput (num, dir) {
     this.inputs[num] = dir
   }
+  isNotOppositeDirection (dir1, dir2) {
+    const sumdirs = dir1 + dir2
+    if (sumdirs === 1 || sumdirs === 5){
+      return false
+    } 
+      return true
+  }
+  killBike (bike_id) {
+    const bike = this.bikes[bike_id]
+    bike.alive = false
+    this.board = this.board.map(lst => lst.map(item => {
+      if (item === bike_id + 1) {
+        item = 0
+      }}))
+  }
   evolve () {
     for (var iter = 0; iter < this.inputs.length; ++iter) {
-      if (this.inputs[iter] !== null) {
-        this.bikes[iter].dir = this.inputs[iter]
-        switch (this.inputs[iter]) {
-          case 1:
-            if (this.bikes[iter].i > 0) {
-              this.bikes[iter].i -= 1
-            }
-            break
-          case 2:
-            if (this.bikes[iter].i < this.blenght) {
-              this.bikes[iter].i += 1
-            }
-            break
-          case 3:
-            if (this.bikes[iter].j < this.blenght) {
-              this.bikes[iter].j += 1
-            }
-            break
-          case 4:
-            if (this.bikes[iter].j > 0) {
-              this.bikes[iter].j -= 1
-            }
-            break
-          default:
-            throw new Error('Not a valid direction of movement')
-        }
-        this.board[this.bikes[iter].i][this.bikes[iter].j] = iter + 1
+      const newdir = this.inputs[iter]
+      const olddir = this.bikes[iter].dir 
+      if (newdir !== null && this.isNotOppositeDirection(olddir, newdir)) {
+        olddir = newdir
       }
     }
+    for (var newiter = 0; newiter < this.bikes.length; ++newiter) {
+      const bike = this.bikes[newiter]
+      switch (bike.dir) {
+        case 0:
+          if (bike.i > 0) {
+            bike.i -= 1
+          }
+          break
+        case 1:
+          if (bike.i < this.blenght) {
+            bike.i += 1
+          }
+          break
+        case 2:
+          if (bike.j < this.blenght) {
+            bike.j += 1
+          }
+          break
+        case 3:
+          if (bike.j > 0) {
+            bike.j -= 1
+          }
+          break
+        default:
+          throw new Error('Not a valid direction of movement')
+      }
+      const actualPos = this.board[bike.i][bike.j]
+      if (actualPos === 0) {
+        actualPos = newiter + 1 
+      } else if (actualPos === -1){
+        this.killBike(newiter)
+      } else {
+        this.killBike(newiter)
+        /* Num of other bike */
+        actualPos -= 1
+        if (bike[actualPos].i == bike.i && bike[actualPos].j == bike.j){
+          this.killBike(actualPos)
+        }
+        actualPos = -1
+      }
+    }
+    /* Get rid of -1 */
+    this.board = this.board.map(lst => lst.map(item => {
+      if (item === -1) {
+        item = 0
+      }}))
     var newboard = this.board.map(lst => lst.slice())
     var newbikes = this.bikes.map(obj => Object.assign({}, obj))
-    return new Turn(newboard, newbikes, [null, null])
+    var newinput = this.inputs.map(item => null)
+    return new Turn(newboard, newbikes, newinput)
   }
 }
 exports.Turn = Turn
