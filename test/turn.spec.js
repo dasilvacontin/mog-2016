@@ -145,4 +145,29 @@ test('Turn :: Multicollision', (t) => {
   ])
   t.end()
 })
+
+test('Turn :: Dying with a tron that is dying at the same turn', (t) => {
+  const board = [
+    [1, 1, 1],
+    [2, 0, 1],
+    [2, 2, 2]
+  ]
+  const bikes = [
+    { i: 1, j: 2, dir: C.DOWN, alive: true },
+    { i: 1, j: 0, dir: C.UP, alive: true }
+  ]
+  const inputs = [null, null]
+  const turn = new Turn(board, bikes, inputs)
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ], 'the bikes should die together')
+  t.deepEqual(nextTurn.bikes, [
+    { i: 2, j: 2, dir: C.DOWN, alive: false },
+    { i: 0, j: 0, dir: C.UP, alive: false }
+  ])
+  t.end()
+})
 // const alivePlayers = players.filter(player => player.isAlive())
