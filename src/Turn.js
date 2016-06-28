@@ -55,21 +55,22 @@ class Turn {
       /* Out of limits */
       if (bike.i < 0 || bike.i > this.blength || bike.j < 0 || bike.j > this.blength) {
         this.killBike(newiter)
-      }
-      /* Check if it crashes with other bikes */
-      var actualPos = this.board[bike.i][bike.j]
-      if (actualPos === 0) {
-        actualPos = newiter + 1
-      } else if (actualPos === -1) {
-        this.killBike(newiter)
-      } else {
-        this.killBike(newiter)
-        /* Num of other bike */
-        actualPos -= 1
-        if (this.bikes[actualPos].i === bike.i && this.bikes[actualPos].j === bike.j) {
-          this.killBike(actualPos)
+      }else{
+        /* Check if it crashes with other bikes */
+        var actualPos = this.board[bike.i][bike.j]
+        if (actualPos === 0) {
+          actualPos = newiter + 1
+        } else if (actualPos === -1) {
+          this.killBike(newiter)
+        } else {
+          this.killBike(newiter)
+          /* Num of other bike */
+          actualPos -= 1
+          if (this.bikes[actualPos].i === bike.i && this.bikes[actualPos].j === bike.j) {
+            this.killBike(actualPos)
+          }
+          actualPos = -1
         }
-        actualPos = -1
       }
     }
     /* Get rid of -1 */
