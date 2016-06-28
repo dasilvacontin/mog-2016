@@ -15,7 +15,18 @@ class Turn {
     var newInputs = []
     for (var i = 0; i < this.bikes.length; i++) {
       if (!(this.inputs[i] === null)) {
-        newBikes[i].dir = this.inputs[i]
+        if (this.inputs[i] === C.UP & this.bikes[i].dir !== C.DOWN) {
+          newBikes[i].dir = this.inputs[i]
+        }
+        if (this.inputs[i] === C.DOWN & this.bikes[i].dir !== C.UP) {
+          newBikes[i].dir = this.inputs[i]
+        }
+        if (this.inputs[i] === C.LEFT & this.bikes[i].dir !== C.RIGHT) {
+          newBikes[i].dir = this.inputs[i]
+        }
+        if (this.inputs[i] === C.RIGHT & this.bikes[i].dir !== C.LEFT) {
+          newBikes[i].dir = this.inputs[i]
+        }
       }
 
       if (newBikes[i].dir === C.UP) {
@@ -27,9 +38,32 @@ class Turn {
       } else if (newBikes[i].dir === C.LEFT) {
         newBikes[i].j--
       }
-      newBoard[newBikes[i].i][newBikes[i].j] = i + 1
+      var num = newBoard[newBikes[i].i]
+      if (!(num === undefined)) {
+        num = num[newBikes[i].j]
+      }
+
+      if (num === undefined) {
+        newBikes[i].alive = false
+      } else if (num !== 0) {
+        newBikes[i].alive = false
+        newBikes[num].alive = false
+      } else {
+        newBoard[newBikes[i].i][newBikes[i].j] = i + 1
+      }
+
       newInputs.push(null)
     }
+    for (var x = 0; x < newBoard.length; x++) {
+      for (var y = 0; y < newBoard[x].length; y++) {
+        if (newBoard[x][y] !== 0) {
+          if (newBikes[newBoard[x][y] - 1].alive !== true) {
+            newBoard[x][y] = 0
+          }
+        }
+      }
+    }
+
     return new Turn(newBoard, newBikes, newInputs)
   }
 }
