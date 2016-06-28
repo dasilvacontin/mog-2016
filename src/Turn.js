@@ -20,7 +20,9 @@ class Turn {
     bike.alive = false
     this.board = this.board.map(lst => lst.map(item => {
       if (item === bikeId + 1) {
-        item = 0
+        return 0
+      } else {
+        return item
       } }))
   }
   evolve () {
@@ -66,7 +68,7 @@ class Turn {
         this.killBike(newiter)
         /* Num of other bike */
         actualPos -= 1
-        if (bike[actualPos].i === bike.i && bike[actualPos].j === bike.j) {
+        if (this.bikes[actualPos].i === bike.i && this.bikes[actualPos].j === bike.j) {
           this.killBike(actualPos)
         }
         actualPos = -1
@@ -75,7 +77,9 @@ class Turn {
     /* Get rid of -1 */
     this.board = this.board.map(lst => lst.map(item => {
       if (item === -1) {
-        item = 0
+        return 0
+      } else {
+        return item
       } }))
     var newboard = this.board.map(lst => lst.slice())
     var newbikes = this.bikes.map(obj => Object.assign({}, obj))
