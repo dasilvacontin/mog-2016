@@ -55,7 +55,7 @@ class Turn {
       /* Out of limits */
       if (bike.i < 0 || bike.i > this.blength || bike.j < 0 || bike.j > this.blength) {
         this.killBike(newiter)
-      } 
+      }
       /* Check if it crashes with other bikes */
       var actualPos = this.board[bike.i][bike.j]
       if (actualPos === 0) {
