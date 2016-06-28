@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test'",
-    "test": "standard && node test/turn.spec.js"
+    "test": "standard && node test/turn.spec.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,10 @@
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
     "standard": "^7.1.2",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
+  },
+  "dependencies": {
+    "clone": "^1.0.2"
   }
 }
