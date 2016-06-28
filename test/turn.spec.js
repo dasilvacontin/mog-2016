@@ -16,6 +16,8 @@ test('Turn', (t) => {
   t.equal(turn.inputs[0], C.UP, 'setInput should update turns input')
 
   const nextTurn = turn.evolve()
+  t.ok(nextTurn instanceof Turn, 'evolve should return an instance of Turn')
+  t.notEqual(turn, nextTurn, 'evolve should return a new instance of Turn')
   t.deepEqual(nextTurn.board, [
     [1, 0, 0],
     [1, 0, 0],
