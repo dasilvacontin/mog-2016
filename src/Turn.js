@@ -59,8 +59,8 @@ class Turn {
       }
       var actualPos = this.board[bike.i][bike.j]
       if (actualPos === 0) {
-        actualPos = newiter + 1 
-      } else if (actualPos === -1){
+        actualPos = newiter + 1
+      } else if (actualPos === -1) {
         this.killBike(newiter)
       } else {
         this.killBike(newiter)
