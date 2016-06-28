@@ -8,10 +8,12 @@ test('Turn :: Basics', (t) => {
     [1, 0, 0],
     [0, 0, 2]
   ]
+  const boardCopy = board.map(row => row.slice())
   const bikes = [
     { i: 1, j: 0, dir: C.RIGHT, alive: true },
     { i: 2, j: 2, dir: C.LEFT, alive: true }
   ]
+  const bikesCopy = Object.assign({}, bikes)
   const inputs = [null, null]
   const turn = new Turn(board, bikes, inputs)
 
@@ -21,7 +23,9 @@ test('Turn :: Basics', (t) => {
   t.equal(turn.inputs[0], C.UP, 'setInput should update turns input')
 
   const nextTurn = turn.evolve()
-  t.deepEqual(turn.inputs, [C.UP, null], 'evolve shouldnt consume/erase the inputs')
+  t.deepEqual(turn.board, boardCopy, 'evolve shouldnt modify the board')
+  t.deepEqual(turn.bikes, bikesCopy, 'evolve shouldnt modify the bikes')
+  t.deepEqual(turn.inputs, [C.UP, null], 'evolve shouldnt modify the inputs')
   turn.setInput(1, C.UP) // shouldnt affect the already evolved turn
 
   t.ok(nextTurn instanceof Turn, 'evolve should return an instance of Turn')
