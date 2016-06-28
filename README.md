@@ -2,6 +2,7 @@
 
 - [ ] fork repo
 - [ ] clone repo
+- [ ] `npm install` to get the dependencies
 - [ ] implement til tests pass
 - [ ] push code
 - [ ] make PR
