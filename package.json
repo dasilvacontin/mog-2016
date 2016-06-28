@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dasilvacontin/mog-2016#readme",
   "devDependencies": {
+    "browserify": "^13.0.1",
     "chokidar-cli": "^1.2.0",
     "standard": "^7.1.2",
     "tape": "^4.6.0"
