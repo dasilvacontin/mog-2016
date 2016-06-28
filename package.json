@@ -6,7 +6,7 @@
   "scripts": {
     "build": "browserify src/main.js -o dist/bundle.js && echo 'bundled!'",
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test; and npm run build'",
-    "test": "standard && node test/turn.spec.js"
+    "test": "standard && node test/turn.spec.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,8 @@
     "browserify": "^13.0.1",
     "chokidar-cli": "^1.2.0",
     "standard": "^7.1.2",
+    "tap-markdown": "^1.2.1",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   }
 }

@@ -15,6 +15,7 @@ class Turn {
 
   evolve () {
     var nt = new Turn(this.board, this.bikes, this.inputs)
+    let nextPositions = {}
     for (let i = 0; i < this.bikes.length; i++) {
       const bike = nt.bikes[i]
       if (bike.alive === false) continue
@@ -39,22 +40,44 @@ class Turn {
       }
       bike.dir = direction
       if (tile(nt.board, bike.i, bike.j) !== 0 || tile(this.board, bike.i, bike.j) !== 0) bike.alive = false
-      if (tile(nt.board, bike.i, bike.j) !== null) nt.board[bike.i][bike.j] = i + 1
+      else if (tile(nt.board, bike.i, bike.j) !== null) {
+        let np = nextPositions[bike.i + ',' + bike.j] || []
+        np.push(i)
+        nextPositions[bike.i + ',' + bike.j] = np
+      }
       nt.inputs[i] = null
     }
-    for (let i = 0; i < this.bikes.length; i++) {
-      const bike = nt.bikes[i]
-      if (tile(nt.board, bike.i, bike.j) !== i + 1) {
-        bike.alive = false
+
+    for (let pos in nextPositions) {
+      if (nextPositions[pos].length > 1) {
+        nextPositions[pos].forEach((bikeId) => {
+          nt.bikes[bikeId].alive = false
+        })
       }
     }
-    // Cleaning dead bikes
-    for (let i = 0; i < nt.board.length; i++) {
-      for (let j = 0; j < nt.board[i].length; j++) {
-        let owner = tile(nt.board, i, j)
-        if (owner !== 0 && nt.bikes[owner - 1].alive === false) nt.board[i][j] = 0
+
+    // for (let i = 0; i < this.bikes.length; i++) {
+    //   const bike = nt.bikes[i]
+    //   if (tile(nt.board, bike.i, bike.j) !== i + 1) {
+    //     bike.alive = false
+    //   }
+    // }
+    // Cleaning dead bikes and moving alive bikes
+
+    nt.bikes.forEach((bike, i) => {
+      if (!bike.alive) {
+        cleanBoard(nt.board, i + 1, this.bikes[i].i, this.bikes[i].j)
+      } else {
+        nt.board[bike.i][bike.j] = i + 1
       }
-    }
+    })
+
+    // for (let i = 0; i < nt.board.length; i++) {
+    //   for (let j = 0; j < nt.board[i].length; j++) {
+    //     let owner = tile(nt.board, i, j)
+    //     if (owner !== 0 && nt.bikes[owner - 1].alive === false) nt.board[i][j] = 0
+    //   }
+    // }
     return nt
   }
 }
@@ -66,23 +89,16 @@ function tile (board, i, j) {
 }
 
 function writeDirection (oldDir, newDir) {
-  switch (oldDir) {
-    case UP:
-      if (newDir === DOWN) return oldDir
-      break
-    case DOWN:
-      if (newDir === UP) return oldDir
-      break
-    case LEFT:
-      if (newDir === RIGHT) return oldDir
-      break
-    case RIGHT:
-      if (newDir === LEFT) return oldDir
-      break
-    default:
-      console.error('unknown direction')
-  }
-  return newDir
+  return (oldDir % 2 !== newDir % 2 ? newDir : oldDir)
+}
+
+function cleanBoard (board, bikeId, i, j) {
+  if (tile(board, i, j) !== bikeId) return
+  board[i][j] = 0
+  cleanBoard(board, bikeId, i + 1, j)
+  cleanBoard(board, bikeId, i - 1, j)
+  cleanBoard(board, bikeId, i, j + 1)
+  cleanBoard(board, bikeId, i, j - 1)
 }
 
 exports.Turn = Turn
