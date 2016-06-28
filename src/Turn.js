@@ -3,7 +3,7 @@ class Turn {
     this.board = board
     this.bikes = bikes
     this.inputs = inputs
-    this.blenght = board[0].length - 1
+    this.blength = board[0].length - 1
   }
   setInput (num, dir) {
     this.inputs[num] = dir
@@ -29,6 +29,7 @@ class Turn {
     for (var iter = 0; iter < this.inputs.length; ++iter) {
       const newdir = this.inputs[iter]
       var olddir = this.bikes[iter].dir
+      console.log(this.isNotOppositeDirection(olddir, newdir))
       if (newdir !== null && this.isNotOppositeDirection(olddir, newdir)) {
         olddir = newdir
       }
@@ -37,28 +38,25 @@ class Turn {
       const bike = this.bikes[newiter]
       switch (bike.dir) {
         case 0:
-          if (bike.i > 0) {
-            bike.i -= 1
-          }
+          bike.i -= 1
           break
         case 1:
-          if (bike.i < this.blenght) {
-            bike.i += 1
-          }
+          bike.i += 1
           break
         case 2:
-          if (bike.j < this.blenght) {
-            bike.j += 1
-          }
+          bike.j += 1
           break
         case 3:
-          if (bike.j > 0) {
-            bike.j -= 1
-          }
+          bike.j -= 1
           break
         default:
           throw new Error('Not a valid direction of movement')
       }
+      /* Out of limits */
+      if (bike.i < 0 || bike.i > this.blength || bike.j < 0 || bike.j > this.blength) {
+        this.killBike(newiter)
+      } 
+      /* Check if it crashes with other bikes */
       var actualPos = this.board[bike.i][bike.j]
       if (actualPos === 0) {
         actualPos = newiter + 1
