@@ -8,9 +8,6 @@ class Turn {
   }
 
   setInput (p, dir) {
-    if (this.inputs[p] == null) {
-      this.inputs[p] = -1
-    }
     this.inputs[p] = dir
   }
 
@@ -18,7 +15,7 @@ class Turn {
     var tempBoard = this.board.map(row => row.slice())
     var tempBikes = this.bikes.map(bike => ({ i: bike.i, j: bike.j, dir: bike.dir, alive: bike.alive }))
 
-    for (var i = 0; i < tempBikes.length; ++i) {
+    for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
       const input = this.inputs[i]
 
@@ -31,29 +28,29 @@ class Turn {
         case C.LEFT: bike.j--; break
         case C.RIGHT: bike.j++; break
       }
-      if (bike.j >= 0 && bike.i >= 0 &&
-        bike.i < tempBoard.length && bike.j < tempBoard[bike.i].length &&
-      tempBoard[bike.i][bike.j] === 0) {
+
+      if (bike.j >= 0 && bike.i >= 0 && bike.i < tempBoard.length &&
+        bike.j < tempBoard[bike.i].length && tempBoard[bike.i][bike.j] === 0) {
         tempBoard[bike.i][bike.j] = i + 1
       } else {
         bike.alive = false
       }
     }
 
-    for (var x = 0; x < tempBikes.length; x++) {
-      for (var y = x + 1; y < tempBikes.length; y++) {
-        if (tempBikes[x].i === tempBikes[y].i && tempBikes[x].j === tempBikes[y].j) {
-          tempBikes[x].alive = false
-          tempBikes[y].alive = false
+    for (let i = 0; i < tempBikes.length; i++) {
+      for (let j = i + 1; j < tempBikes.length; j++) {
+        if (tempBikes[i].i === tempBikes[j].i && tempBikes[i].j === tempBikes[j].j) {
+          tempBikes[i].alive = false
+          tempBikes[j].alive = false
         }
       }
     }
 
-    for (var j = 0; j < tempBoard.length; ++j) {
-      for (var k = 0; k < tempBoard[j].length; ++k) {
-        var cell = tempBoard[j][k]
+    for (let i = 0; i < tempBoard.length; ++i) {
+      for (let j = 0; j < tempBoard[i].length; ++j) {
+        var cell = tempBoard[i][j]
         if (cell > 0 && tempBikes[cell - 1].alive === false) {
-          tempBoard[j][k] = 0
+          tempBoard[i][j] = 0
         }
       }
     }
