@@ -60,8 +60,6 @@ document.addEventListener('keydown', function (e) {
     case KEY.W: turn.setInput(0, C.UP); break
     case KEY.D: turn.setInput(0, C.RIGHT); break
     case KEY.A: turn.setInput(0, C.LEFT); break
-  }
-  switch (e.keyCode) {
     case KEY.DOWN: turn.setInput(1, C.DOWN); break
     case KEY.UP: turn.setInput(1, C.UP); break
     case KEY.RIGHT: turn.setInput(1, C.RIGHT); break

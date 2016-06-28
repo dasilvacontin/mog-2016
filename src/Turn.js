@@ -3,7 +3,7 @@ const C = require('./constants.js')
 class Turn {
   constructor (board, bikes, inputs) {
     this.board = board.map(row => row.slice())
-    this.bikes = bikes.map(bike => ({ i: bike.i, j: bike.j, dir: bike.dir, alive: bike.alive }))
+    this.bikes = bikes.map(bike => Object.assign({}, bike))
     this.inputs = inputs
   }
 
@@ -13,13 +13,13 @@ class Turn {
 
   evolve () {
     var tempBoard = this.board.map(row => row.slice())
-    var tempBikes = this.bikes.map(bike => ({ i: bike.i, j: bike.j, dir: bike.dir, alive: bike.alive }))
+    var tempBikes = this.bikes.map(bike => Object.assign({}, bike))
 
     for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
       const input = this.inputs[i]
 
-      if (input != null && this.isOppositeDirection(input, bike.dir)) {
+      if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
         bike.dir = input
       }
       switch (bike.dir) {
@@ -39,7 +39,7 @@ class Turn {
 
     for (let i = 0; i < tempBikes.length; i++) {
       for (let j = i + 1; j < tempBikes.length; j++) {
-        if (tempBikes[i].i === tempBikes[j].i && tempBikes[i].j === tempBikes[j].j) {
+        if (tempBikes[i].alive === true && tempBikes[i].i === tempBikes[j].i && tempBikes[i].j === tempBikes[j].j) {
           tempBikes[i].alive = false
           tempBikes[j].alive = false
         }
@@ -58,12 +58,8 @@ class Turn {
     return new Turn(tempBoard, tempBikes, [null, null])
   }
 
-  isOppositeDirection (d, b) {
-    if ((d === C.LEFT || d === C.RIGHT) && (b === C.LEFT || b === C.RIGHT)) {
-      return false
-    } else if ((d === C.UP || d === C.DOWN) && (b === C.UP || b === C.DOWN)) {
-      return false
-    }
+  isNotOppositeDirection (d, b) {
+    if (d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN) return false
     return true
   }
 }
