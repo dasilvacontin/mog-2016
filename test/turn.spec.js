@@ -63,10 +63,10 @@ test('Turn :: Directions', (t) => {
     [0, 1, 0],
     [0, 1, 0],
     [0, 0, 0]
-  ], 'evolve shouldnt use input direction if is agains bike direction')
+  ], 'ignore input that make bikes turn around')
   t.deepEqual(nextTurn.bikes, [
     { i: 1, j: 1, dir: C.DOWN, alive: true }
-  ], 'evolve shouldnt use input direction if is agains bike direction')
+  ], 'ignore input that make bikes turn around')
   t.end()
 })
 
@@ -102,7 +102,7 @@ test('Turn :: Advanced', (t) => {
   t.end()
 })
 
-test('Turn :: Not moving dead bikes', (t) => {
+test('Turn :: Dont move dead bikes', (t) => {
   const board = [
     [0, 2, 0],
     [0, 0, 0],
@@ -119,7 +119,7 @@ test('Turn :: Not moving dead bikes', (t) => {
     [0, 2, 0],
     [0, 2, 0],
     [0, 0, 0]
-  ], 'evolve shouldnt use dead bikes')
+  ], 'evolve shouldnt modify/use dead bikes')
   t.end()
 })
 
@@ -171,7 +171,7 @@ test('Turn :: Dying with a tron that is dying at the same turn', (t) => {
   t.end()
 })
 
-test('Turn :: Not cutting other trons', (t) => {
+test('Turn :: Not cutting other bikes', (t) => {
   const board = [
     [1, 1, 1],
     [2, 2, 1],
