@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test'",
+    "build": "browserify src/main.js -o dist/bundle.js && echo 'bundled!'",
+    "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test && npm run build'",
     "test": "standard && node test/turn.spec.js"
   },
   "repository": {
@@ -19,6 +20,7 @@
   "homepage": "https://github.com/dasilvacontin/mog-2016#readme",
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
+    "clone": "^1.0.2",
     "standard": "^7.1.2",
     "tape": "^4.6.0"
   }
