@@ -8,5 +8,7 @@ module.exports = {
     { i: -1, j: 0 },
     { i: 1, j: 0 },
     { i: 0, j: -1 },
-    { i: 0, j: 1 }]
+    { i: 0, j: 1 }],
+
+  EMPTY_CELL: 0
 }

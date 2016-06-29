@@ -1,9 +1,22 @@
 const C = require('./constants.js')
 
+function removeBike (board, bikeid, i, j) {
+  if (j < 0 || i < 0 || i >= board.length || j >= board[i].length) return
+  const c = board[i][j]
+  if (c === bikeid) {
+    board[i][j] = C.EMPTY_CELL
+    removeBike(board, bikeid, i + 1, j)
+    removeBike(board, bikeid, i - 1, j)
+    removeBike(board, bikeid, i, j + 1)
+    removeBike(board, bikeid, i, j - 1)
+  }
+  return
+}
+
 class Turn {
   constructor (board, bikes, inputs) {
-    this.board = board.map(row => row.slice())
-    this.bikes = bikes.map(bike => Object.assign({}, bike))
+    this.board = board
+    this.bikes = bikes
     this.inputs = inputs
   }
 
@@ -14,53 +27,48 @@ class Turn {
   evolve () {
     var tempBoard = this.board.map(row => row.slice())
     var tempBikes = this.bikes.map(bike => Object.assign({}, bike))
-
+    const collisions = {}
     for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
       const input = this.inputs[i]
-
-      if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
-        bike.dir = input
+      if (bike.alive) {
+        if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
+          bike.dir = input
+        }
+        bike.i += C.VECTOR_DIR[bike.dir].i
+        bike.j += C.VECTOR_DIR[bike.dir].j
+        // Out of bounds
+        if (bike.j < 0 ||
+          bike.i < 0 ||
+          bike.i >= tempBoard.length ||
+          bike.j >= tempBoard[bike.i].length ||
+          tempBoard[bike.i][bike.j] !== C.EMPTY_CELL) {
+          bike.alive = false
+        }
       }
-      bike.i += C.VECTOR_DIR[bike.dir].i
-      bike.j += C.VECTOR_DIR[bike.dir].j
-      if (bike.j >= 0 && bike.i >= 0 && bike.i < tempBoard.length &&
-        bike.j < tempBoard[bike.i].length && tempBoard[bike.i][bike.j] === 0) {
-        tempBoard[bike.i][bike.j] = i + 1
-      } else {
-        bike.alive = false
+      const posKey = bike.i + 'x' + bike.j
+      let colArr = collisions[posKey]
+      if (!colArr) {
+        colArr = collisions[posKey] = []
       }
+      colArr.push(i)
     }
 
     for (let i = 0; i < tempBikes.length; i++) {
-      for (let j = i + 1; j < tempBikes.length; j++) {
-        if (tempBikes[i].alive === true && tempBikes[i].i === tempBikes[j].i && tempBikes[i].j === tempBikes[j].j) {
-          tempBikes[i].alive = false
-          tempBikes[j].alive = false
-        }
+      const bike = tempBikes[i]
+      const oldBike = this.bikes[i]
+      if (collisions[bike.i + 'x' + bike.j].length > 1) bike.alive = false
+      if (!bike.alive) {
+        removeBike(tempBoard, i + 1, oldBike.i, oldBike.j)
+      } else {
+        tempBoard[bike.i][bike.j] = i + 1
       }
     }
-    for (let i = 0; i < tempBoard.length; ++i) {
-      for (let j = 0; j < tempBoard[i].length; ++j) {
-        var cell = tempBoard[i][j]
-        if (cell > 0 && tempBikes[cell - 1].alive === false) {
-          tempBoard[i][j] = 0
-        }
-      }
-    }
-
     return new Turn(tempBoard, tempBikes, [null, null])
   }
 
   isNotOppositeDirection (d, b) {
     return !(d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN)
   }
-
-  /*  removeBikes(board, bikeId, i, j) {
-    let cell = board[i][j]
-    if (cell === bikeId + 1) {
-      cell = 0
-    }
-  }*/
 }
 exports.Turn = Turn
