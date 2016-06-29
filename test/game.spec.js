@@ -2,7 +2,7 @@ const test = require('tape')
 const EventEmitter = require('events')
 const shortid = require('shortid')
 
-const Game = require('../src/Game.js')
+const { Game } = require('../src/Game.js')
 const C = require('../src/constants.js')
 
 function fakeSocket () {
