@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = {
   EMPTY_CELL: 0,
   RIGHT: 0,
