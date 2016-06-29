@@ -29,11 +29,13 @@ class Game {
       this.turn.inputs[pos] = null
       this.players[socketid] = pos
       this.sockets[pos] = socket
+      this.turn.board[y][x] = pos + 1
     } else {
       this.turn.bikes.push({ i: y, j: x, dir: C.DOWN, alive: true })
       this.turn.inputs.push(null)
       this.players[socketid] = this.turn.inputs.length - 1
       this.sockets.push(socket)
+      this.turn.board[y][x] = this.turn.inputs.length
     }
     this.sockets.forEach((s) => {
       if (s) s.emit('game:state', {turn: this.turn, players: this.players})
@@ -44,6 +46,7 @@ class Game {
     let pos = this.players[socket.id]
     delete this.players[socket.id]
     this.sockets[pos] = null
+    this.turn.setInput(pos, C.SELF_DESTRUCT)
   }
 
   onChangeDir (socket, dir) {

@@ -9355,11 +9355,13 @@ class Game {
       this.turn.inputs[pos] = null
       this.players[socketid] = pos
       this.sockets[pos] = socket
+      this.turn.board[y][x] = pos + 1
     } else {
       this.turn.bikes.push({ i: y, j: x, dir: C.DOWN, alive: true })
       this.turn.inputs.push(null)
       this.players[socketid] = this.turn.inputs.length - 1
       this.sockets.push(socket)
+      this.turn.board[y][x] = this.turn.inputs.length
     }
     this.sockets.forEach((s) => {
       if (s) s.emit('game:state', {turn: this.turn, players: this.players})
@@ -9370,6 +9372,7 @@ class Game {
     let pos = this.players[socket.id]
     delete this.players[socket.id]
     this.sockets[pos] = null
+    this.turn.setInput(pos, C.SELF_DESTRUCT)
   }
 
   onChangeDir (socket, dir) {
@@ -9387,9 +9390,9 @@ class Game {
 exports.Game = Game
 
 },{"./Turn.js":54,"./constants.js":55}],54:[function(require,module,exports){
-var clone = require('clone')
+const clone = require('clone')
 
-const { RIGHT, LEFT, UP, DOWN } = require('./constants.js')
+const { SELF_DESTRUCT, RIGHT, LEFT, UP, DOWN } = require('./constants.js')
 
 class Turn {
   constructor (board, bikes, inputs) {
@@ -9409,7 +9412,10 @@ class Turn {
       const bike = nt.bikes[i]
       if (bike.alive === false) continue
       let direction = this.inputs[i]
-      if (direction == null) direction = this.bikes[i].dir
+      if (direction === SELF_DESTRUCT) {
+        bike.alive = false
+        continue
+      } else if (direction == null) direction = this.bikes[i].dir
       else direction = writeDirection(bike.dir, direction)
       switch (direction) {
         case RIGHT:
@@ -9430,7 +9436,6 @@ class Turn {
       bike.dir = direction
       if (tile(nt.board, bike.i, bike.j) !== 0 || tile(this.board, bike.i, bike.j) !== 0) {
         bike.alive = false
-        console.log(`Ha muerto ${i}`)
       } else if (tile(nt.board, bike.i, bike.j) !== null) {
         let np = nextPositions[bike.i + ',' + bike.j] || []
         np.push(i)
@@ -9442,7 +9447,6 @@ class Turn {
     for (let pos in nextPositions) {
       if (nextPositions[pos].length > 1) {
         nextPositions[pos].forEach((bikeId) => {
-          console.log(`Ha muerto ${bikeId}`)
           nt.bikes[bikeId].alive = false
         })
       }
@@ -9497,6 +9501,7 @@ exports.Turn = Turn
 
 },{"./constants.js":55,"clone":9}],55:[function(require,module,exports){
 module.exports = {
+  SELF_DESTRUCT: -1,
   RIGHT: 0,
   UP: 1,
   LEFT: 2,

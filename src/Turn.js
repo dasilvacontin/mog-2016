@@ -1,6 +1,6 @@
-var clone = require('clone')
+const clone = require('clone')
 
-const { RIGHT, LEFT, UP, DOWN } = require('./constants.js')
+const { SELF_DESTRUCT, RIGHT, LEFT, UP, DOWN } = require('./constants.js')
 
 class Turn {
   constructor (board, bikes, inputs) {
@@ -20,7 +20,10 @@ class Turn {
       const bike = nt.bikes[i]
       if (bike.alive === false) continue
       let direction = this.inputs[i]
-      if (direction == null) direction = this.bikes[i].dir
+      if (direction === SELF_DESTRUCT) {
+        bike.alive = false
+        continue
+      } else if (direction == null) direction = this.bikes[i].dir
       else direction = writeDirection(bike.dir, direction)
       switch (direction) {
         case RIGHT:
@@ -41,7 +44,6 @@ class Turn {
       bike.dir = direction
       if (tile(nt.board, bike.i, bike.j) !== 0 || tile(this.board, bike.i, bike.j) !== 0) {
         bike.alive = false
-        console.log(`Ha muerto ${i}`)
       } else if (tile(nt.board, bike.i, bike.j) !== null) {
         let np = nextPositions[bike.i + ',' + bike.j] || []
         np.push(i)
@@ -53,7 +55,6 @@ class Turn {
     for (let pos in nextPositions) {
       if (nextPositions[pos].length > 1) {
         nextPositions[pos].forEach((bikeId) => {
-          console.log(`Ha muerto ${bikeId}`)
           nt.bikes[bikeId].alive = false
         })
       }
