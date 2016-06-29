@@ -22,13 +22,8 @@ class Turn {
       if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
         bike.dir = input
       }
-      switch (bike.dir) {
-        case C.UP: bike.i--; break
-        case C.DOWN: bike.i++; break
-        case C.LEFT: bike.j--; break
-        case C.RIGHT: bike.j++; break
-      }
-
+      bike.i += C.VECTOR_DIR[bike.dir].i
+      bike.j += C.VECTOR_DIR[bike.dir].j
       if (bike.j >= 0 && bike.i >= 0 && bike.i < tempBoard.length &&
         bike.j < tempBoard[bike.i].length && tempBoard[bike.i][bike.j] === 0) {
         tempBoard[bike.i][bike.j] = i + 1
@@ -45,7 +40,6 @@ class Turn {
         }
       }
     }
-
     for (let i = 0; i < tempBoard.length; ++i) {
       for (let j = 0; j < tempBoard[i].length; ++j) {
         var cell = tempBoard[i][j]
@@ -59,8 +53,14 @@ class Turn {
   }
 
   isNotOppositeDirection (d, b) {
-    if (d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN) return false
-    return true
+    return !(d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN)
   }
+
+  /*  removeBikes(board, bikeId, i, j) {
+    let cell = board[i][j]
+    if (cell === bikeId + 1) {
+      cell = 0
+    }
+  }*/
 }
 exports.Turn = Turn
