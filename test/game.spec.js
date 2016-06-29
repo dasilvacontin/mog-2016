@@ -11,8 +11,9 @@ function fakeSocket () {
 
   const _emit = socket.emit
   socket.emit = function () {
+    const args = arguments
     setTimeout(function () {
-      _emit.apply(socket, arguments)
+      _emit.apply(socket, args)
     }, 1)
   }
 
