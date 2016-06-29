@@ -21,7 +21,7 @@ function fakeSocket () {
 }
 
 test('Game :: onPlayerJoin', (t) => {
-  t.timeoutAfter(10)
+  t.timeoutAfter(100)
   const game = new Game()
   const socket1 = fakeSocket()
   const socket2 = fakeSocket()

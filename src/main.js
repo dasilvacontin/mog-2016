@@ -1,5 +1,21 @@
 /* global myCanvas */
-const { Turn } = require('./Turn.js')
+
+const io = require('socket.io-client')
+const socket = io('http://localhost:3000')
+const {Game} = require('./Game.js')
+
+var game = new Game()
+
+function onGameState (g) {
+  game = g
+}
+
+socket.on('connect', () => {
+  socket.on('ok', () => console.log('all good'))
+  socket.on('game:state', onGameState)
+})
+
+// const { Turn } = require('./Turn.js')
 const C = require('./constants.js')
 
 myCanvas.width = window.innerWidth
@@ -13,19 +29,19 @@ const ctx = myCanvas.getContext('2d')
 let matrix = Array(size).fill().map(() => Array(size).fill().map(() => 0))
 matrix[0][0] = 1
 
-let turn = new Turn(matrix
-, [{
-  i: 0,
-  j: 0,
-  dir: C.RIGHT,
-  alive: true
-}], [null])
+// let turn = new Turn(matrix
+// , [{
+//   i: 0,
+//   j: 0,
+//   dir: C.RIGHT,
+//   alive: true
+// }], [null])
 
-const colors = ['black', 'blue']
+const colors = ['black', 'blue', 'green', 'yellow']
 
 function renderGame () {
-  for (let i = 0; i < turn.board.length; ++i) {
-    const row = turn.board[i]
+  for (let i = 0; i < game.turn.board.length; ++i) {
+    const row = game.turn.board[i]
     for (let j = 0; j < row.length; ++j) {
       const cell = row[j]
       const color = colors[cell]
@@ -37,9 +53,7 @@ function renderGame () {
 
 renderGame()
 setInterval(function () {
-  turn = turn.evolve()
   renderGame()
-  console.log('step')
 }, 100)
 
 const KEY = {
@@ -50,19 +64,23 @@ const KEY = {
 }
 
 document.addEventListener('keydown', function (e) {
+  let dir = null
   switch (e.keyCode) {
     case KEY.S:
-      turn.setInput(0, C.DOWN)
+      dir = C.DOWN
       break
     case KEY.W:
-      turn.setInput(0, C.UP)
+      dir = C.UP
       break
     case KEY.A:
-      turn.setInput(0, C.LEFT)
+      dir = C.LEFT
       break
     case KEY.D:
-      turn.setInput(0, C.RIGHT)
+      dir = C.RIGHT
       break
     default:
   }
+  if (dir === null) return
+  console.log(dir)
+  socket.emit('changeDir', dir)
 })

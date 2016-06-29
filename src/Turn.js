@@ -39,8 +39,10 @@ class Turn {
           console.error('unknown direction')
       }
       bike.dir = direction
-      if (tile(nt.board, bike.i, bike.j) !== 0 || tile(this.board, bike.i, bike.j) !== 0) bike.alive = false
-      else if (tile(nt.board, bike.i, bike.j) !== null) {
+      if (tile(nt.board, bike.i, bike.j) !== 0 || tile(this.board, bike.i, bike.j) !== 0) {
+        bike.alive = false
+        console.log(`Ha muerto ${i}`)
+      } else if (tile(nt.board, bike.i, bike.j) !== null) {
         let np = nextPositions[bike.i + ',' + bike.j] || []
         np.push(i)
         nextPositions[bike.i + ',' + bike.j] = np
@@ -51,6 +53,7 @@ class Turn {
     for (let pos in nextPositions) {
       if (nextPositions[pos].length > 1) {
         nextPositions[pos].forEach((bikeId) => {
+          console.log(`Ha muerto ${bikeId}`)
           nt.bikes[bikeId].alive = false
         })
       }
