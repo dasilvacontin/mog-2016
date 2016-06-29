@@ -19,7 +19,10 @@ class Turn {
     for (let i = 0; i < this.bikes.length; i++) {
       const bike = nt.bikes[i]
       if (bike.alive === false) continue
+
       let direction = this.inputs[i]
+      nt.inputs[i] = null
+
       if (direction === SELF_DESTRUCT) {
         bike.alive = false
         continue
@@ -49,7 +52,6 @@ class Turn {
         np.push(i)
         nextPositions[bike.i + ',' + bike.j] = np
       }
-      nt.inputs[i] = null
     }
 
     for (let pos in nextPositions) {

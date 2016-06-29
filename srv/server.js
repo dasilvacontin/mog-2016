@@ -28,4 +28,4 @@ server.listen(PORT, () => console.log(`listening on ${PORT}`))
 setInterval(function () {
   game.nextTurn()
   console.log('Step')
-}, 500)
+}, 10)

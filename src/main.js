@@ -54,7 +54,7 @@ function renderGame () {
 renderGame()
 setInterval(function () {
   renderGame()
-}, 100)
+}, 10)
 
 const KEY = {
   W: 87,
