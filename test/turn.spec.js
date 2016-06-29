@@ -110,9 +110,10 @@ test('Turn :: Dont move dead bikes', (t) => {
   ]
   const bikes = [
     { i: 1, j: 1, dir: C.DOWN, alive: false },
-    { i: 0, j: 1, dir: C.DOWN, alive: true }
+    { i: 0, j: 1, dir: C.DOWN, alive: true },
+    { i: 1, j: 1, dir: C.LEFT, alive: false }
   ]
-  const inputs = [null, null]
+  const inputs = [null, null, C.RIGHT]
   const turn = new Turn(board, bikes, inputs)
   const nextTurn = turn.evolve()
   t.deepEqual(nextTurn.board, [
@@ -120,6 +121,8 @@ test('Turn :: Dont move dead bikes', (t) => {
     [0, 2, 0],
     [0, 0, 0]
   ], 'evolve shouldnt modify/use dead bikes')
+  t.deepEqual(nextTurn.bikes[2], { i: 1, j: 1, dir: C.LEFT, alive: false },
+    'broken bikes shouldnt change direction')
   t.end()
 })
 
