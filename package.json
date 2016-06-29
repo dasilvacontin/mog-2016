@@ -6,7 +6,7 @@
   "scripts": {
     "build": "browserify src/main.js -o dist/bundle.js && echo 'bundled!'",
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test && npm run build'",
-    "test": "standard && node test/turn.spec.js"
+    "test": "standard && node test/*.spec.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,9 @@
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
     "clone": "^1.0.2",
+    "shortid": "^2.2.6",
     "standard": "^7.1.2",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   }
 }
