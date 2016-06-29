@@ -210,7 +210,7 @@ test('Turn :: Self-Destruct', (t) => {
     [1, 1, 0],
     [0, 0, 0]
   ]
-  const bikes = { i: 1, j: 1, dir: C.RIGHT, alive: true }
+  const bikes = [{ i: 1, j: 1, dir: C.RIGHT, alive: true }]
   const inputs = [null]
   const turn = new Turn(board, bikes, inputs)
 
