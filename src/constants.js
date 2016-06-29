@@ -10,5 +10,6 @@ module.exports = {
     { i: 0, j: -1 },
     { i: 0, j: 1 }],
 
-  EMPTY_CELL: 0
+  EMPTY_CELL: 0,
+  SELF_DESTRUCT: -1
 }

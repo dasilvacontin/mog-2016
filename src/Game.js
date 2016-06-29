@@ -1,50 +1,52 @@
 const { Turn } = require('./Turn.js')
 const C = require('./constants.js')
 
-class Game {
+function getRandomInt (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
-  constructor (boardSize) {
+function getRandomEmptyPosition (board) {
+  var result = { i: getRandomInt(0, board.length - 1), j: getRandomInt(0, board[0].length) }
+
+  while (board[result.i][result.j] !== C.EMPTY_CELL) {
+    result = { i: getRandomInt(0, board.length - 1), j: getRandomInt(0, board[0].length) }
+  }
+  return result
+}
+
+class Game {
+  constructor (boardSize = 30) {
     var board = []
     for (let i = 0; i < boardSize; ++i) {
       var a = []
       for (let j = 0; j < boardSize; ++j) a.push(0)
       board.push(a)
     }
-    this.board = board
-    this.bikes = []
-    this.inputs = []
+
     this.sockets = []
     this.players = {}
-    this.nPlayers = 0
+    this.turn = new Turn(board, [], [])
   }
 
   onPlayerJoin (socket) {
-    console.log('playerConnected')
+    const turn = this.turn
+    var tempBoard = turn.board.map(row => row.slice())
+    var nPlayer = -1
 
-    let nPlayer = this.nPlayers
-    for (let i = 0; i < nPlayer; ++i) {
-      if (socket[i] == null) {
-        nPlayer = i
-      }
+    var cont = 0
+    while (nPlayer === -1) {
+      if (this.sockets[cont] === null || cont === this.sockets.length) nPlayer = cont
+      cont++
     }
-    if (nPlayer !== -1) {
-      this.sockets[nPlayer] = socket
-    } else {
-      this.sockets.push(socket)
-    }
-
+    this.sockets.push(socket)
     this.players[socket.id] = nPlayer
-    this.bikes.push({ i: 0, j: 0, dir: C.RIGHT, alive: true })
 
-    this.inputs = []
-    for (let i = 0; i < this.bikes.length; ++i) {
-      this.inputs.push(null)
-    }
+    var initPos = getRandomEmptyPosition(tempBoard)
 
-    this.nPlayers++
-
-    this.turn = new Turn(this.board, this.bikes, this.inputs)
-    this.sockets.forEach(s => s.emit('game:state'))
+    turn.bikes.push({ i: initPos.i, j: initPos.j, dir: getRandomInt(0, 3), alive: true })
+    turn.board[initPos.i][initPos.j] = nPlayer + 1
+    turn.inputs.push(null)
+    this.sockets.forEach(s => { if (s != null) s.emit('game:state', this) })
   }
 
   onChangeDir (socket, dir) {
@@ -52,7 +54,8 @@ class Game {
   }
 
   onPlayerLeave (socket) {
-    console.log('playerLeave')
+    this.sockets[this.players[socket.id]] = null
+    this.turn.setInput(this.players[socket.id], C.SELF_DESTRUCT)
     delete this.players[socket.id]
   }
 }

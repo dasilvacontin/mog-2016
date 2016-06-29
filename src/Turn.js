@@ -15,8 +15,8 @@ function removeBike (board, bikeid, i, j) {
 
 class Turn {
   constructor (board, bikes, inputs) {
-    this.board = board
-    this.bikes = bikes
+    this.board = board.map(row => row.slice())
+    this.bikes = bikes.map(bike => Object.assign({}, bike))
     this.inputs = inputs
   }
 
@@ -31,6 +31,7 @@ class Turn {
     for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
       const input = this.inputs[i]
+      if (input === C.SELF_DESTRUCT) bike.alive = false
       if (bike.alive) {
         if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
           bike.dir = input
@@ -45,26 +46,29 @@ class Turn {
           tempBoard[bike.i][bike.j] !== C.EMPTY_CELL) {
           bike.alive = false
         }
+        const posKey = bike.i + 'x' + bike.j
+        let colArr = collisions[posKey]
+        if (!colArr) {
+          colArr = collisions[posKey] = []
+        }
+        colArr.push(i)
       }
-      const posKey = bike.i + 'x' + bike.j
-      let colArr = collisions[posKey]
-      if (!colArr) {
-        colArr = collisions[posKey] = []
-      }
-      colArr.push(i)
     }
 
     for (let i = 0; i < tempBikes.length; i++) {
       const bike = tempBikes[i]
       const oldBike = this.bikes[i]
-      if (collisions[bike.i + 'x' + bike.j].length > 1) bike.alive = false
+      if (bike.alive && collisions[bike.i + 'x' + bike.j].length > 1) {
+        bike.alive = false
+      }
       if (!bike.alive) {
         removeBike(tempBoard, i + 1, oldBike.i, oldBike.j)
       } else {
         tempBoard[bike.i][bike.j] = i + 1
       }
     }
-    return new Turn(tempBoard, tempBikes, [null, null])
+    var newInputs = Array.apply(null, {length: this.inputs.length}).map(value => null)
+    return new Turn(tempBoard, tempBikes, newInputs)
   }
 
   isNotOppositeDirection (d, b) {
