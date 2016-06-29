@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test'",
-    "test": "standard && node test/turn.spec.js"
+    "test": "standard && node test/turn.spec.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,9 @@
   "homepage": "https://github.com/dasilvacontin/mog-2016#readme",
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
+    "shortid": "^2.2.6",
     "standard": "^7.1.2",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   }
 }
