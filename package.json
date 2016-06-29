@@ -6,7 +6,7 @@
   "scripts": {
     "build": "browserify src/main.js -o dist/bundle.js && echo 'bundled!'",
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test; and npm run build'",
-    "test": "standard && node test/*.spec.js | tap-spec"
+    "test": "standard && tape test/**/*.spec.js | tap-spec"
   },
   "repository": {
     "type": "git",
