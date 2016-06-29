@@ -1,32 +1,40 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'test' ]
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'install' ]
 2 info using npm@3.9.5
 3 info using node@v6.2.2
-4 verbose stack Error: Failed to parse json
-4 verbose stack Unexpected token '<' at 7:1
-4 verbose stack <<<<<<< HEAD
-4 verbose stack ^
-4 verbose stack     at parseError (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:390:11)
-4 verbose stack     at parseJson (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:79:23)
-4 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:48:5
-4 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:78:16
-4 verbose stack     at tryToString (fs.js:449:3)
-4 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:436:12)
-5 verbose cwd /Users/Elendow/Documents/Proyectos/mog-2016
-6 error Darwin 15.5.0
-7 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "test"
-8 error node v6.2.2
-9 error npm  v3.9.5
-10 error file /Users/Elendow/Documents/Proyectos/mog-2016/package.json
-11 error code EJSONPARSE
-12 error Failed to parse json
-12 error Unexpected token '<' at 7:1
-12 error <<<<<<< HEAD
-12 error ^
-13 error File: /Users/Elendow/Documents/Proyectos/mog-2016/package.json
-14 error Failed to parse package.json data.
-14 error package.json must be actual JSON, not just JavaScript.
-14 error
-14 error This is not a bug in npm.
-14 error Tell the package author to fix their package.json file. JSON.parse
-15 verbose exit [ 1, true ]
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly rollbackFailedOptional Starting
+8 silly rollbackFailedOptional Finishing
+9 silly runTopLevelLifecycles Starting
+10 silly runTopLevelLifecycles Finishing
+11 silly install printInstalled
+12 verbose stack Error: Failed to parse json
+12 verbose stack Unexpected token '<' at 7:1
+12 verbose stack <<<<<<< HEAD
+12 verbose stack ^
+12 verbose stack     at parseError (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:390:11)
+12 verbose stack     at parseJson (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:79:23)
+12 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:48:5
+12 verbose stack     at /usr/local/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:78:16
+12 verbose stack     at tryToString (fs.js:449:3)
+12 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:436:12)
+13 verbose cwd /Users/Elendow/Documents/Proyectos/mog-2016
+14 error Darwin 15.5.0
+15 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install"
+16 error node v6.2.2
+17 error npm  v3.9.5
+18 error file /Users/Elendow/Documents/Proyectos/mog-2016/package.json
+19 error code EJSONPARSE
+20 error Failed to parse json
+20 error Unexpected token '<' at 7:1
+20 error <<<<<<< HEAD
+20 error ^
+21 error File: /Users/Elendow/Documents/Proyectos/mog-2016/package.json
+22 error Failed to parse package.json data.
+22 error package.json must be actual JSON, not just JavaScript.
+22 error
+22 error This is not a bug in npm.
+22 error Tell the package author to fix their package.json file. JSON.parse
+23 verbose exit [ 1, true ]
