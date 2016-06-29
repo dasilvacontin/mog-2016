@@ -14,7 +14,7 @@ class Turn {
     var newBikes = clone(this.bikes)
     var newInputs = []
     for (var i = 0; i < this.bikes.length; i++) {
-      if (!(this.inputs[i] === null)) {
+      if (!(this.inputs[i] === null) && newBikes[i].alive) {
         if (this.inputs[i] === C.UP & this.bikes[i].dir !== C.DOWN) {
           newBikes[i].dir = this.inputs[i]
         }
@@ -28,30 +28,32 @@ class Turn {
           newBikes[i].dir = this.inputs[i]
         }
       }
+      if (newBikes[i].alive) {
+        if (newBikes[i].dir === C.UP) {
+          newBikes[i].i--
+        } else if (newBikes[i].dir === C.DOWN) {
+          newBikes[i].i++
+        } else if (newBikes[i].dir === C.RIGHT) {
+          newBikes[i].j++
+        } else if (newBikes[i].dir === C.LEFT) {
+          newBikes[i].j--
+        }
+        var num = newBoard[newBikes[i].i]
+        if (!(num === undefined)) {
+          num = num[newBikes[i].j]
+        }
 
-      if (newBikes[i].dir === C.UP) {
-        newBikes[i].i--
-      } else if (newBikes[i].dir === C.DOWN) {
-        newBikes[i].i++
-      } else if (newBikes[i].dir === C.RIGHT) {
-        newBikes[i].j++
-      } else if (newBikes[i].dir === C.LEFT) {
-        newBikes[i].j--
+        if (num === undefined) {
+          newBikes[i].alive = false
+        } else if (num !== 0) {
+          newBikes[i].alive = false
+          if (newBikes[i].i === newBikes[num - 1].i & newBikes[i].j === newBikes[num - 1].j) {
+            newBikes[num - 1].alive = false
+          }
+        } else {
+          newBoard[newBikes[i].i][newBikes[i].j] = i + 1
+        }
       }
-      var num = newBoard[newBikes[i].i]
-      if (!(num === undefined)) {
-        num = num[newBikes[i].j]
-      }
-
-      if (num === undefined) {
-        newBikes[i].alive = false
-      } else if (num !== 0) {
-        newBikes[i].alive = false
-        newBikes[num].alive = false
-      } else {
-        newBoard[newBikes[i].i][newBikes[i].j] = i + 1
-      }
-
       newInputs.push(null)
     }
     for (var x = 0; x < newBoard.length; x++) {
