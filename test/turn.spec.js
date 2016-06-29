@@ -47,6 +47,29 @@ test('Turn :: Basics', (t) => {
   t.end()
 })
 
+test('Turn :: Directions', (t) => {
+  const board = [
+    [0, 1, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+  const bikes = [
+    { i: 0, j: 1, dir: C.DOWN, alive: true }
+  ]
+  const inputs = [C.UP]
+  const turn = new Turn(board, bikes, inputs)
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [0, 1, 0],
+    [0, 1, 0],
+    [0, 0, 0]
+  ], 'ignore input that make bikes turn around')
+  t.deepEqual(nextTurn.bikes, [
+    { i: 1, j: 1, dir: C.DOWN, alive: true }
+  ], 'ignore input that make bikes turn around')
+  t.end()
+})
+
 test('Turn :: Advanced', (t) => {
   const board = [
     [1, 2, 2],
@@ -75,6 +98,104 @@ test('Turn :: Advanced', (t) => {
     { i: 2, j: 1, dir: C.LEFT, alive: false },
     { i: 2, j: 1, dir: C.RIGHT, alive: false },
     { i: 0, j: 2, dir: C.UP, alive: false }
+  ])
+  t.end()
+})
+
+test('Turn :: Dont move dead bikes', (t) => {
+  const board = [
+    [0, 2, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+  const bikes = [
+    { i: 1, j: 1, dir: C.DOWN, alive: false },
+    { i: 0, j: 1, dir: C.DOWN, alive: true },
+    { i: 1, j: 1, dir: C.LEFT, alive: false }
+  ]
+  const inputs = [null, null, C.RIGHT]
+  const turn = new Turn(board, bikes, inputs)
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [0, 2, 0],
+    [0, 2, 0],
+    [0, 0, 0]
+  ], 'evolve shouldnt modify/use dead bikes')
+  t.deepEqual(nextTurn.bikes[2], { i: 1, j: 1, dir: C.LEFT, alive: false },
+    'broken bikes shouldnt change direction')
+  t.end()
+})
+
+test('Turn :: Multicollision', (t) => {
+  const board = [
+    [0, 1, 0],
+    [4, 0, 2],
+    [0, 3, 0]
+  ]
+  const bikes = [
+    { i: 0, j: 1, dir: C.DOWN, alive: true },
+    { i: 1, j: 2, dir: C.LEFT, alive: true },
+    { i: 2, j: 1, dir: C.UP, alive: true },
+    { i: 1, j: 0, dir: C.RIGHT, alive: true }
+  ]
+  const inputs = [null, null, null, null]
+  const turn = new Turn(board, bikes, inputs)
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ])
+  t.end()
+})
+
+test('Turn :: Dying with a tron that is dying at the same turn', (t) => {
+  const board = [
+    [1, 1, 1],
+    [2, 0, 1],
+    [2, 2, 2]
+  ]
+  const bikes = [
+    { i: 1, j: 2, dir: C.DOWN, alive: true },
+    { i: 1, j: 0, dir: C.UP, alive: true }
+  ]
+  const inputs = [null, null]
+  const turn = new Turn(board, bikes, inputs)
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ], 'the bikes should die together')
+  t.deepEqual(nextTurn.bikes, [
+    { i: 2, j: 2, dir: C.DOWN, alive: false },
+    { i: 0, j: 0, dir: C.UP, alive: false }
+  ])
+  t.end()
+})
+
+test('Turn :: Not cutting other bikes', (t) => {
+  const board = [
+    [1, 1, 1],
+    [2, 2, 1],
+    [0, 1, 1]
+  ]
+  const bikes = [
+    { i: 2, j: 1, dir: C.LEFT, alive: true },
+    { i: 1, j: 1, dir: C.RIGHT, alive: true }
+  ]
+  const inputs = [null, null]
+  const turn = new Turn(board, bikes, inputs)
+
+  const nextTurn = turn.evolve()
+  t.deepEqual(nextTurn.board, [
+    [1, 1, 1],
+    [0, 0, 1],
+    [1, 1, 1]
+  ], 'the dead bike should not override the alive bike')
+  t.deepEqual(nextTurn.bikes, [
+    { i: 2, j: 0, dir: C.LEFT, alive: true },
+    { i: 1, j: 2, dir: C.RIGHT, alive: false }
   ])
   t.end()
 })
