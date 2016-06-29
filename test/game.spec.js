@@ -140,4 +140,5 @@ test('Game :: onPlayerLeave', (t) => {
   t.equal(bikes[0], null, 'should free up the slot in the bikes array')
   t.equal(sockets[0], null, 'should free up the slot in the sockets array')
   t.deepEqual(inputs, [null, C.UP], 'should reset its input')
+  t.end()
 })
