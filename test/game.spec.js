@@ -20,66 +20,95 @@ function fakeSocket () {
   return socket
 }
 
-test('Game :: onPlayerJoin', (t) => {
-  t.timeoutAfter(10)
-  const game = new Game()
-  const socket1 = fakeSocket()
-  const socket2 = fakeSocket()
+function boardHasCells (board, cells) {
+  const cellsObj = {}
+  cells.forEach(cell => { cellsObj[cell] = true })
 
-  let finished = 0
-  function done () {
-    finished++
-    if (finished === 2) t.end()
+  for (let i = 0; i < board.length; ++i) {
+    const row = board[i]
+    for (let j = 0; j < row.length; ++j) {
+      const cell = row[j]
+      delete cellsObj[cell]
+    }
   }
 
-  socket1.once('game:state', function (state) {
-    t.equal(state.turn.bikes.length, 1,
-      'turn bikes should equal number of players')
-    t.equal(state.players[socket1.id], 0,
-      'map with player => bikeId should update')
+  return Object.keys(cellsObj).length === 0
+}
 
-    socket1.once('game:state', function (game) {
-      t.equal(game.turn.bikes.length, 2,
-        'turn bikes should equal number of players')
-      t.equal(game.players[socket1.id], 0,
-        'map with player => bikeId should update')
-      t.equal(game.players[socket2.id], 1,
-        'map with player => bikeId should update')
-      done()
-    })
+test('Game :: onPlayerJoin', (t) => {
+  t.plan(17)
+  t.timeoutAfter(100)
 
-    socket2.once('game:state', function (game) {
-      t.equal(game.turn.bikes.length, 2,
-        'turn bikes should equal number of players')
-      t.equal(game.players[socket1.id], 0,
-        'map with player => bikeId should update')
-      t.equal(game.players[socket2.id], 1,
-        'map with player => bikeId should update')
-      done()
-    })
+  const game = new Game()
+  const { turn, players, sockets } = game
+  const { board, bikes, inputs } = turn
+
+  const socket = fakeSocket()
+  socket.once('game:state', function (state) {
+    t.ok(boardHasCells(board, [1]), 'should place players on the board')
+    t.equal(bikes.length, 1, "should update turn's bikes")
+    t.deepEqual(inputs, [null], "should update turn's inputs")
+    t.deepEqual(players, {
+      [socket.id]: 0
+    }, 'should update (socketId => bikeId) hash')
+
+    function stateUpdate (state) {
+      const { turn, players } = state
+      const { board, bikes, inputs } = turn
+
+      t.ok(boardHasCells(board, [1, 2]), 'should place players on the board')
+      t.equal(bikes.length, 2, "should update turn's bikes")
+      t.deepEqual(inputs, [null, null], "should update turn's inputs")
+      t.deepEqual(players, {
+        [socket.id]: 0,
+        [socket2.id]: 1
+      }, 'should update (socketId => bikeId) hash')
+    }
+
+    const socket2 = fakeSocket()
+    socket.once('game:state', stateUpdate)
+    socket2.once('game:state', stateUpdate)
 
     game.onPlayerJoin(socket2)
-    t.equal(game.turn.bikes.length, 2,
-      'turn bikes should equal number of players')
-    t.equal(game.turn.inputs.length, 2,
-      'turn inputs should equal number of players')
-    t.equal(game.players[socket2.id], 1,
-      'map with player => bikeId should update')
-    t.equal(game.sockets[0], socket1,
-      'should store socket in sockets array')
-    t.equal(game.sockets[1], socket2,
+    t.ok(boardHasCells(board, [1, 2]), 'should place players on the board')
+    t.equal(bikes.length, 2, "should update turn's bikes")
+    t.deepEqual(inputs, [null, null], "should update turn's inputs")
+    t.deepEqual(players, {
+      [socket.id]: 0,
+      [socket2.id]: 1
+    }, 'should update (socketId => bikeId) hash')
+    t.deepEqual(
+      sockets.map(socket => socket.id),
+      [socket].map(socket => socket.id),
       'should store socket in sockets array')
   })
 
-  game.onPlayerJoin(socket1)
-  t.equal(game.turn.bikes.length, 1,
-    'turn bikes should equal number of players')
-  t.equal(game.turn.inputs.length, 1,
-    'turn inputs should equal number of players')
-  t.equal(game.players[socket1.id], 0,
-    'map with player => bikeId should update')
-  t.equal(game.sockets[0], socket1,
+  game.onPlayerJoin(socket)
+  t.ok(boardHasCells(board, [1]), 'player should be placed in the board')
+  t.equal(bikes.length, 1, "should update turn's bikes")
+  t.equal(inputs.length, 1, "should update turn's inputs")
+  t.deepEqual(players, { [socket.id]: 0 }, 'should update (socketId => bikeId) hash')
+  t.deepEqual(
+    sockets.map(socket => socket.id),
+    [socket].map(socket => socket.id),
     'should store socket in sockets array')
+})
+
+test('Game :: onChangeDir', (t) => {
+  const game = new Game()
+  const { inputs } = game.turn
+  const socket = fakeSocket()
+  const socket2 = fakeSocket()
+
+  game.onPlayerJoin(socket)
+  game.onPlayerJoin(socket2)
+
+  game.onChangeDir(socket, C.DOWN)
+  t.deepEqual(inputs, [C.DOWN, null], "onChangeDir should update current turn's input")
+
+  game.onChangeDir(socket2, C.UP)
+  t.deepEqual(inputs, [C.DOWN, C.UP], "onChangeDir should update current turn's input")
+  t.end()
 })
 
 /*
@@ -93,37 +122,22 @@ test('Game :: onPlayerJoin', (t) => {
 */
 test('Game :: onPlayerLeave', (t) => {
   const game = new Game()
-  const socket1 = fakeSocket()
-  const socket2 = fakeSocket()
-  const socket3 = fakeSocket()
+  const { turn, players, sockets } = game
+  const { board, bikes, inputs } = turn
 
-  game.onPlayerJoin(socket1)
-  game.onPlayerJoin(socket2)
-  game.onPlayerLeave(socket1)
-  game.onPlayerJoin(socket3)
-  t.deepEqual(game.players, {
-    [socket2.id]: 1,
-    [socket3.id]: 0
-  }, 'players hash should handle leaves correctly')
-  t.equal(game.sockets.length, 2)
-  t.equal(game.sockets[0], socket3)
-  t.equal(game.sockets[1], socket2)
-
-  t.end()
-})
-
-test('Game :: onChangeDir', (t) => {
-  const game = new Game()
   const socket = fakeSocket()
   const socket2 = fakeSocket()
 
   game.onPlayerJoin(socket)
   game.onPlayerJoin(socket2)
   game.onChangeDir(socket, C.DOWN)
-  t.deepEqual(game.turn.inputs, [C.DOWN, null],
-    "onChangeDir should update current turn's input")
   game.onChangeDir(socket2, C.UP)
-  t.deepEqual(game.turn.inputs, [C.DOWN, C.UP],
-    "onChangeDir should update current turn's input")
-  t.end()
+
+  game.onPlayerLeave(socket)
+  t.deepEqual(players, { [socket2.id]: 1 }, 'should handle leaves for players hash')
+  t.notOk(boardHasCells(board, [1]), 'should cleanup bike in board')
+  t.ok(boardHasCells(board, [2]), 'the other bikes should still be there')
+  t.equal(bikes[0], null, 'should free up the slot in the bikes array')
+  t.equal(sockets[0], null, 'should free up the slot in the sockets array')
+  t.deepEqual(inputs, [null, C.UP], 'should reset its input')
 })
