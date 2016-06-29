@@ -36,7 +36,7 @@ function boardHasCells (board, cells) {
 }
 
 test('Game :: onPlayerJoin', (t) => {
-  t.plan(17)
+  t.plan(22)
   t.timeoutAfter(100)
 
   const game = new Game()
@@ -79,7 +79,7 @@ test('Game :: onPlayerJoin', (t) => {
     }, 'should update (socketId => bikeId) hash')
     t.deepEqual(
       sockets.map(socket => socket.id),
-      [socket].map(socket => socket.id),
+      [socket, socket2].map(socket => socket.id),
       'should store socket in sockets array')
   })
 
