@@ -9,6 +9,7 @@ class Game {
     this.inputs = []
     this.minsize = 3
     this.maxsize = 8
+    this.turn = null
   }
   isCellFree (ci, cj) {
     return (this.board[ci][cj] === 0)
@@ -33,13 +34,15 @@ class Game {
       bj = (Math.random() * (this.bsize - 1)) | 0
     }
     this.bikes.push({i: bi, j: bj, dir: bdir, alive: true})
+    this.inputs.push(null)
+
     const cboard = this.board.map(row => row.slice())
     const cbikes = Object.assign({}, this.bikes)
     const cinputs = this.inputs.map(row => row.slice())
 
     return new Turn(cboard, cbikes, cinputs)
   }
-  onPlayerConnected (psocket) {
+  onPlayerJoin (psocket) {
     /* Search for null */
     var s = 0
     while (s < this.sockets.length && this.socket[s] != null) ++s
@@ -49,7 +52,14 @@ class Game {
     this.players[psocket.id] = s
     this.sockets[s] = psocket
 
-    return this.newGame()
+    this.turn = this.newGame()
+    const game = Object.assign({}, this)
+    /* send turn to other players */
+    for (var p = 0; p < this.sockets.length; ++p) {
+      if (this.socket[p] != null) {
+        this.sockets[p].emit('game:state', game)
+      }
+    }
   }
 }
 
