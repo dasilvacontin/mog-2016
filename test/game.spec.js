@@ -108,6 +108,8 @@ test('Game :: onPlayerLeave', (t) => {
   t.equal(game.sockets.length, 2)
   t.equal(game.sockets[0], socket3)
   t.equal(game.sockets[1], socket2)
+
+  t.end()
 })
 
 test('Game :: onChangeDir', (t) => {
