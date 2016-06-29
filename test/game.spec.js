@@ -8,6 +8,14 @@ const C = require('../src/constants.js')
 function fakeSocket () {
   const socket = new EventEmitter()
   socket.id = shortid()
+
+  const _emit = socket.emit
+  socket.emit = function () {
+    setTimeout(function () {
+      _emit.apply(socket, arguments)
+    }, 1)
+  }
+
   return socket
 }
 
