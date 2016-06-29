@@ -112,6 +112,9 @@ test('Game :: onChangeDir', (t) => {
 })
 
 /*
+  onPlayerLeave sets player's input to C.SELF_DESTRUCT, removes the player
+  from the players hash, and frees up the slot in the sockets array.
+
   hint:
   you can delete object properties doing
   delete obj.a
@@ -134,11 +137,15 @@ test('Game :: onPlayerLeave', (t) => {
   game.onChangeDir(socket2, C.UP)
 
   game.onPlayerLeave(socket)
-  t.deepEqual(players, { [socket2.id]: 1 }, 'should handle leaves for players hash')
-  t.notOk(boardHasCells(board, [1]), 'should cleanup bike in board')
-  t.ok(boardHasCells(board, [2]), 'the other bikes should still be there')
-  t.equal(bikes[0], null, 'should free up the slot in the bikes array')
-  t.equal(sockets[0], null, 'should free up the slot in the sockets array')
-  t.deepEqual(inputs, [null, C.UP], 'should reset its input')
+  t.deepEqual(inputs, [C.SELF_DESTRUCT, C.UP],
+    "should set bike's input to SELF_DESTRUCT action")
+  t.deepEqual(players, { [socket2.id]: 1 }, 'should remove player from players hash')
+  t.ok(boardHasCells(board, [1, 2]), 'bike should still be in board')
+  t.notEqual(bikes[0], null, 'bike should still be in the bikes array')
+  t.deepEqual(
+    sockets.map(socket => socket && socket.id),
+    [null, socket2.id],
+    'should free up the slot in the sockets array')
+
   t.end()
 })
