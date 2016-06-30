@@ -232,5 +232,7 @@ test('Game :: tick', (t) => {
   game.turn.bikes.forEach(bike => { bike.alive = false })
   game.tick()
   t.equal(game.turns.length, 1, 'should reset turns array when game restarts')
+  t.equal(game.turn.bikes.length, 2, 'there should be two bikes')
+  t.ok(game.turn.bikes.every(bike => bike.alive), 'every bike should be alive')
   t.end()
 })
