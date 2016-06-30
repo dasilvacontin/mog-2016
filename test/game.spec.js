@@ -112,6 +112,8 @@ test('Game :: Player joins started game', (t) => {
     game.sockets.map(socket => socket.id),
     [socket, socket2, socket3].map(socket => socket.id),
     'should store socket in sockets array')
+
+  t.end()
 })
 
 test('Game :: onChangeDir', (t) => {
