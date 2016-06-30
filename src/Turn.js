@@ -44,6 +44,7 @@ class Turn {
 
     for (let i = 0; i < tempBikes.length; i++) {
       const bike = tempBikes[i]
+      if (!bike) continue
       const oldBike = this.bikes[i]
       if (bike.alive && collisions[bike.i + 'x' + bike.j].length > 1) {
         bike.alive = false
