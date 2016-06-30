@@ -1,9 +1,14 @@
 // server.js
-const app = require('express')()
+const express = require('express')
+const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const {Game} = require('../src/Game.js')
 
+app.use(express.static('dist'))
+app.get('/', function (req, res) {
+  res.sendfile('../dist/index.html')
+})
 // const server = require('http').createServer()
 const PORT = process.env.PORT || 3000
 
@@ -32,5 +37,5 @@ http.listen(PORT, function () {
 
 setInterval(function () {
   game.tick()
-  console.log('Step')
+  // console.log('Step')
 }, 50)
