@@ -4,7 +4,7 @@ class Turn {
     this.board = board
     this.newboard = board.map(lst => lst.slice())
     this.bikes = bikes
-    this.newbikes = bikes.map(obj => Object.assign({}, obj))
+    this.newbikes = bikes === [] ? [] : bikes.map(obj => Object.assign({}, obj))
     this.inputs = inputs
     this.blength = board[0].length - 1
   }
@@ -35,26 +35,29 @@ class Turn {
           case C.DOWN: bike.i += 1; break
           case C.RIGHT: bike.j += 1; break
           case C.LEFT: bike.j -= 1; break
+          case C.SELF_DESTRUCT: this.killBike(newiter); break
           default:
-            throw new Error('Not a valid direction of movement')
+            throw new Error('Not a valid direction of movement: ' + bike.dir)
         }
-        this.newbikes[newiter] = bike
-        /* Out of limits */
-        if (bike.i < 0 || bike.i > this.blength || bike.j < 0 || bike.j > this.blength) {
-          this.killBike(newiter)
-        } else {
-          /* Check if it crashes with other bikes */
-          var actualPos = this.newboard[bike.i][bike.j]
-          if (actualPos === 0) {
-            this.newboard[bike.i][bike.j] = newiter + 1
-          } else if (actualPos === -1) {
+        if (bike.alive) {
+          this.newbikes[newiter] = bike
+          /* Out of limits */
+          if (bike.i < 0 || bike.i > this.blength || bike.j < 0 || bike.j > this.blength) {
             this.killBike(newiter)
           } else {
-            this.killBike(newiter)
-            /* Num of other bike */
-            actualPos -= 1
-            if (this.newbikes[actualPos].i === bike.i && this.newbikes[actualPos].j === bike.j) {
-              this.killBike(actualPos, this.newbikes, this.newboard)
+            /* Check if it crashes with other bikes */
+            var actualPos = this.newboard[bike.i][bike.j]
+            if (actualPos === 0) {
+              this.newboard[bike.i][bike.j] = newiter + 1
+            } else if (actualPos === -1) {
+              this.killBike(newiter)
+            } else {
+              this.killBike(newiter)
+              /* Num of other bike */
+              actualPos -= 1
+              if (this.newbikes[actualPos].i === bike.i && this.newbikes[actualPos].j === bike.j) {
+                this.killBike(actualPos, this.newbikes, this.newboard)
+              }
             }
           }
         }
