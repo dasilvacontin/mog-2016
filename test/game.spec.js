@@ -94,6 +94,28 @@ test('Game :: onPlayerJoin', (t) => {
     'should store socket in sockets array')
 })
 
+test('Game :: Player joins started game', (t) => {
+  const game = new Game()
+  const socket = fakeSocket()
+  const socket2 = fakeSocket()
+
+  game.onPlayerJoin(socket)
+  game.onPlayerJoin(socket2)
+  game.tick()
+
+  const socket3 = fakeSocket()
+  game.onPlayerJoin(socket3)
+  t.notOk(boardHasCells(game.turn.board, [3]), 'player shouldnt be placed on the board')
+  t.equal(game.turn.bikes.length, 2, 'a bike should not be created')
+  t.equal(game.turn.inputs.length, 2, 'doesnt require an input')
+  t.deepEqual(
+    game.sockets.map(socket => socket.id),
+    [socket, socket2, socket3].map(socket => socket.id),
+    'should store socket in sockets array')
+
+  t.end()
+})
+
 test('Game :: onChangeDir', (t) => {
   const game = new Game()
   const { inputs } = game.turn
