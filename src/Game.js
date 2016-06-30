@@ -3,13 +3,7 @@ const C = require('./constants.js')
 
 class Game {
   constructor ({ size = 10 } = {}) {
-    var board = []
-    for (let i = 0; i < size; ++i) {
-      var a = []
-      for (let j = 0; j < size; ++j) a.push(0)
-      board.push(a)
-    }
-
+    var board = Array.apply(null, {length: size}).map(value => Array.apply(null, {length: size}).map(value => 0))
     this.sockets = []
     this.players = {}
     this.turn = new Turn(board, [], [])
@@ -17,18 +11,33 @@ class Game {
   }
 
   tick () {
-    const nextTurn = this.turn.evolve()
-    this.turns.push(nextTurn)
-    this.turn = nextTurn
+    if (this.turn.bikes.length > 1) {
+      if (this.turn.bikes.filter(bike => bike.alive).length < 2) {
+        this.restartGame()
+        return
+      }
+      const nextTurn = this.turn.evolve()
+      this.turns.push(nextTurn)
+      this.turn = nextTurn
+      this.sockets.forEach(s => { s && s.emit('game:state', { players: this.players, turn: this.turn }) })
+    }
+  }
+
+  restartGame () {
+    const size = this.turn.board.length
+    var board = Array.apply(null, {length: size}).map(value => Array.apply(null, {length: size}).map(value => 0))
+    this.turn = new Turn(board, [], [])
+    this.turns = [this.turn]
+    this.sockets.forEach(socket => socket && this.turn.addBike(this.players[socket.id]))
   }
 
   onPlayerJoin (socket) {
     var bikeId = 0
-    while (this.sockets[bikeId] != null || this.turn.inputs[bikeId] != null) bikeId++
+    while (this.sockets[bikeId] != null) bikeId++
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
-    this.turn.addBike(bikeId)
-    this.sockets.forEach(s => { s && s.emit('game:state', this) })
+    if (this.turns.length < 2) this.turn.addBike(bikeId)
+    this.sockets.forEach(s => { s && s.emit('game:state', { players: this.players, turn: this.turn }) })
   }
 
   onChangeDir (socket, dir) {
