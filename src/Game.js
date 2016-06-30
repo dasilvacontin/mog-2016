@@ -2,14 +2,8 @@ const { Turn } = require('../src/Turn.js')
 const C = require('../src/constants.js')
 
 class Game {
-  constructor () {
-    const board = [
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0]
-    ]
+  constructor ({ size = 10 } = {}) {
+    const board = Array(size).fill().map(() => Array(size).fill(C.EMPTY_CELL))
     this.turn = new Turn(board, [], [])
     this.turns = [this.turn]
     this.players = {}
