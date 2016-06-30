@@ -38,4 +38,4 @@ http.listen(PORT, function () {
 setInterval(function () {
   game.tick()
   // console.log('Step')
-}, 50)
+}, 200)
