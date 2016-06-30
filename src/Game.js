@@ -15,16 +15,20 @@ class Game {
   }
 
   restartGame () {
+    let i = 0
     this.sockets.forEach((s) => {
       if (s == null) return
+      i += 1
       let pos = this.players[s.id]
-      if (!(this.turn.bikes[pos]) || this.turn.bikes[pos].alive) return
-      let x = Math.floor(Math.random() * (this.turn.board[0].length - 1))
-      let y = Math.floor(Math.random() * (this.turn.board.length - 1))
-      this.turn.inputs[pos] = null
-      this.turn.bikes[pos] = { i: y, j: x, dir: C.DOWN, alive: true }
-      this.turn.board[y][x] = pos + 1
+      if (!(this.turn.bikes[pos]) || !this.turn.bikes[pos].alive) {
+        let x = Math.floor(Math.random() * (this.turn.board[0].length - 1))
+        let y = Math.floor(Math.random() * (this.turn.board.length - 1))
+        this.turn.inputs[pos] = null
+        this.turn.bikes[pos] = { i: y, j: x, dir: C.DOWN, alive: true }
+        this.turn.board[y][x] = pos + 1
+      }
     })
+    // console.log(`there are ${i} players`)
     this.currentTurn = 0
     this.turns = []
     this.turns[this.currentTurn] = this.turn

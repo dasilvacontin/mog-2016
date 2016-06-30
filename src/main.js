@@ -38,7 +38,7 @@ matrix[0][0] = 1
 //   alive: true
 // }], [null])
 
-const colors = ['black', 'blue', 'green', 'yellow']
+const colors = ['black', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
 
 function renderGame () {
   for (let i = 0; i < game.turn.board.length; ++i) {

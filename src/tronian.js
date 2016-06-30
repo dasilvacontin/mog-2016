@@ -1,5 +1,5 @@
 const io = require('socket.io-client')
-// const SERVER_IP = 'http://localhost:3000'
+// const SERVER_IP = 'http://localhost:5000'
 // const SERVER_IP = 'http://mog2016-tron.herokuapp.com/'
 const SERVER_IP = 'https://lit-waters-26157.herokuapp.com/'
 var socket = io(SERVER_IP)
@@ -47,7 +47,7 @@ function onGameState (game) {
     following = true
     // console.log('No era buena la primera')
   }
-  socket.emit('changeDir', myDir)
+  socket.emit('changeDir', myDir, game.nTurn)
   // console.log(bike, myDir)
 }
 
