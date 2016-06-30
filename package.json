@@ -6,7 +6,8 @@
   "scripts": {
     "build": "browserify src/main.js -o dist/bundle.js && echo 'bundled!'",
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test; and npm run build'",
-    "test": "standard && tape test/**/*.spec.js | tap-notify | tap-spec"
+    "test": "standard && tape test/**/*.spec.js | tap-notify | tap-spec",
+    "start": "npm i --only=dev && npm run build && node src/server.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "tape": "^4.6.0"
   },
   "dependencies": {
+    "express": "^4.14.0",
     "socket.io": "^1.4.8",
     "socket.io-client": "^1.4.8"
   }
