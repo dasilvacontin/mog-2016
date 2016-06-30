@@ -199,4 +199,30 @@ test('Turn :: Not cutting other bikes', (t) => {
   ])
   t.end()
 })
+
+/*
+  Player's input is C.SELF_DESTRUCT when the player disconnects.
+  It causes the bike to break down.
+ */
+test('Turn :: Self-Destruct', (t) => {
+  const board = [
+    [0, 0, 0],
+    [1, 1, 0],
+    [0, 0, 0]
+  ]
+  const bikes = [{ i: 1, j: 1, dir: C.RIGHT, alive: true }]
+  const inputs = [null]
+  const turn = new Turn(board, bikes, inputs)
+
+  turn.setInput(0, C.SELF_DESTRUCT)
+  const nextTurn = turn.evolve()
+  t.equal(nextTurn.bikes[0].alive, false, 'the bike should break down')
+  t.deepEqual(nextTurn.board, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ], 'the bike and its trail should be cleaned up from the board')
+  t.deepEqual(nextTurn.inputs, [null], 'inputs should be reset as always')
+  t.end()
+})
 // const alivePlayers = players.filter(player => player.isAlive())
