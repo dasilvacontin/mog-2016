@@ -18,6 +18,7 @@ class Turn {
     const collisions = {}
     for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
+      if (!bike) continue
       const input = this.inputs[i]
       if (input === C.SELF_DESTRUCT) bike.alive = false
       if (bike.alive) {
