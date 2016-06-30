@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test'",
-    "test": "standard && node test/*.spec.js | tap-spec"
+    "test": "standard && tape test/**/*.spec.js | tap-notify | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "chokidar-cli": "^1.2.0",
     "shortid": "^2.2.6",
     "standard": "^7.1.2",
+    "tap-notify": "^1.0.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   },
