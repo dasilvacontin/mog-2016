@@ -92,6 +92,7 @@ class Game {
         this.turns[i] = auxTurn
       }
       this.turn = auxTurn
+      this.sendState()
     } else {
       this.turn.setInput(this.players[socket.id], dir)
     }
