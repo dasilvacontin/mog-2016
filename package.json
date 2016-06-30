@@ -19,6 +19,7 @@
   "homepage": "https://github.com/dasilvacontin/mog-2016#readme",
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
+    "clone": "^1.0.2",
     "shortid": "^2.2.6",
     "standard": "^7.1.2",
     "tap-notify": "^1.0.0",

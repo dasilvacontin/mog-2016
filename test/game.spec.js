@@ -1,6 +1,7 @@
 const test = require('tape')
 const EventEmitter = require('events')
 const shortid = require('shortid')
+const clone = require('clone')
 
 const { Game } = require('../src/Game.js')
 const C = require('../src/constants.js')
@@ -113,6 +114,42 @@ test('Game :: Player joins started game', (t) => {
     [socket, socket2, socket3].map(socket => socket.id),
     'should store socket in sockets array')
 
+  t.end()
+})
+
+test('Game :: Player fills free slot in started game', (t) => {
+  const game = new Game()
+  const socket1 = fakeSocket()
+  const socket2 = fakeSocket()
+  const socket3 = fakeSocket()
+
+  game.onPlayerJoin(socket1)
+  game.onPlayerJoin(socket2)
+  game.onPlayerJoin(socket3)
+  game.tick()
+
+  const { turn, players, sockets } = game
+  const { board, bikes, inputs } = turn
+
+  const oldBike = clone(bikes[1])
+  game.onPlayerLeave(socket2)
+  const socket4 = fakeSocket()
+  game.onPlayerJoin(socket4)
+
+  t.deepEqual(players, {
+    [socket1.id]: 0,
+    [socket4.id]: 1,
+    [socket3.id]: 2
+  }, 'should fill free slot in players')
+  t.deepEqual(
+    sockets.map(socket => socket && socket.id),
+    [socket1.id, socket4.id, socket3.id],
+    'should fill free slot in sockets')
+  t.ok(boardHasCells(board, [1, 2, 3]),
+    'bike from player who just left should still be there on the map')
+  t.deepEqual(bikes[1], oldBike, 'bike shouldnt have been modified')
+  t.ok(bikes[1].alive, 'bike should still be alive til next tick')
+  t.deepEqual(inputs, [null, C.SELF_DESTRUCT, null], "joined bike shouldnt overwrite old bike's input")
   t.end()
 })
 
