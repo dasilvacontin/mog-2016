@@ -35,12 +35,12 @@ class Game {
     this.sockets[bikeId] = null
     // check whether there are players on the board
     this.started = false
-    for (let i = 0; i < this.players.length; ++i) {
-      this.started = this.players[i] != null
+    for (let i = 0; i < this.sockets.length; ++i) {
+      this.started = this.sockets[i] != null
     }
   }
 
-  tick () {
+  checkStarted () {
     // check whether there are players on the board, minimum 2
     this.started = false
     let count = 0
@@ -50,9 +50,14 @@ class Game {
       }
     }
     this.started = count >= 2
-    const nextTurn = this.turn.evolve()
-    this.turns.push(nextTurn)
-    this.turn = nextTurn
+  }
+  tick () {
+    this.checkStarted()
+    if (this.started) {
+      const nextTurn = this.turn.evolve()
+      this.turns.push(nextTurn)
+      this.turn = nextTurn
+    }
     this.sendState()
   }
 
