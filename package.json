@@ -1,0 +1,28 @@
+{
+  "name": "mog-2016",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test'",
+    "test": "standard && tape test/**/*.spec.js | tap-notify | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dasilvacontin/mog-2016.git"
+  },
+  "author": "David da Silva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dasilvacontin/mog-2016/issues"
+  },
+  "homepage": "https://github.com/dasilvacontin/mog-2016#readme",
+  "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "shortid": "^2.2.6",
+    "standard": "^7.1.2",
+    "tap-notify": "^1.0.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.0"
+  }
+}
