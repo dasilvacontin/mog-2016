@@ -57,10 +57,15 @@ class Turn {
     bikes.forEach((bike, i) => {
       if (!bike.alive) return
 
+      const input = inputs[i]
+      if (input === C.SELF_DESTRUCT) {
+        bike.alive = false
+        return
+      }
+
       let nextDir = bike.dir
-      const inputDir = inputs[i]
-      if (inputDir !== null && !directionsAreOpposite(inputDir, bike.dir)) {
-        nextDir = inputDir
+      if (input !== null && !directionsAreOpposite(input, bike.dir)) {
+        nextDir = input
       }
       const dirInc = IncForDir[nextDir]
       bike.i += dirInc.i
@@ -106,6 +111,20 @@ class Turn {
     })
 
     return nextTurn
+  }
+
+  addPlayer (bikeId) {
+    let i = -1
+    let j = -1
+    while (getCell(this.board, i, j) !== C.EMPTY_CELL) {
+      i = Math.floor(Math.random() * this.board.length)
+      j = Math.floor(Math.random() * this.board[0].length)
+    }
+
+    const bike = { i, j, dir: C.RIGHT, alive: true }
+    this.bikes[bikeId] = bike
+    this.board[i][j] = bikeId + 1
+    this.inputs[bikeId] = null
   }
 }
 exports.Turn = Turn

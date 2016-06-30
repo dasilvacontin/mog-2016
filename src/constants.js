@@ -5,5 +5,6 @@ module.exports = {
   RIGHT: 0,
   DOWN: 1,
   LEFT: 2,
-  UP: 3
+  UP: 3,
+  SELF_DESTRUCT: 4
 }
