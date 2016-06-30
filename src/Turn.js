@@ -121,7 +121,8 @@ class Turn {
       j = Math.floor(Math.random() * this.board[0].length)
     }
 
-    const bike = { i, j, dir: C.RIGHT, alive: true }
+    const dir = Math.floor(Math.random() * 4)
+    const bike = { i, j, dir: dir, alive: true }
     this.bikes[bikeId] = bike
     this.board[i][j] = bikeId + 1
     this.inputs[bikeId] = null
