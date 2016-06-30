@@ -4,11 +4,14 @@ const C = require('../src/constants.js')
 class Game {
   constructor () {
     const board = [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0]
     ]
     this.turn = new Turn(board, [], [])
+    this.turns = [this.turn]
     this.players = {}
     this.sockets = []
   }
@@ -38,6 +41,12 @@ class Game {
 
     delete this.players[socket.id]
     this.sockets[bikeId] = null
+  }
+
+  tick () {
+    const nextTurn = this.turn.evolve()
+    this.turns.push(nextTurn)
+    this.turn = nextTurn
   }
 }
 exports.Game = Game
