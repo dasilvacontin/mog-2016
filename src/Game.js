@@ -22,12 +22,7 @@ class Game {
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
     this.turn.addPlayer(bikeId)
-
-    const state = {
-      turn: this.turn,
-      players: this.players
-    }
-    this.sockets.forEach((socket) => socket && socket.emit('game:state', state))
+    this.sendState()
   }
 
   onChangeDir (socket, dir) {
@@ -47,6 +42,15 @@ class Game {
     const nextTurn = this.turn.evolve()
     this.turns.push(nextTurn)
     this.turn = nextTurn
+    this.sendState()
+  }
+
+  sendState () {
+    const state = {
+      turn: this.turn,
+      players: this.players
+    }
+    this.sockets.forEach((socket) => socket && socket.emit('game:state', state))
   }
 }
 exports.Game = Game

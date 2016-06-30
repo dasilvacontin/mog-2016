@@ -1,20 +1,21 @@
 /* global myCanvas */
+const io = require('socket.io-client')
 const { Game } = require('./Game.js')
 const C = require('./constants.js')
 
-const socket = {
-  id: 'asdf',
-  emit: () => {}
-}
 const game = new Game()
-game.onPlayerJoin(socket)
+const socket = io()
+socket.on('game:state', (state) => {
+  game.players = state.players
+  game.turn = state.turn
+})
 
 const edge = 50
 myCanvas.width = window.innerWidth
 myCanvas.height = window.innerHeight
 const ctx = myCanvas.getContext('2d')
 
-const colors = ['black', 'blue']
+const colors = ['black', 'blue', 'red']
 
 function renderGame () {
   const turn = game.turn
@@ -30,11 +31,7 @@ function renderGame () {
 }
 
 renderGame()
-setInterval(function () {
-  game.tick()
-  renderGame()
-  console.log('step')
-}, 500)
+setInterval(function () { renderGame() }, 500)
 
 const KEY = {
   W: 87,
@@ -43,8 +40,15 @@ const KEY = {
   D: 68
 }
 
+const DIR_FOR_KEY = {
+  [KEY.W]: C.UP,
+  [KEY.A]: C.LEFT,
+  [KEY.S]: C.DOWN,
+  [KEY.D]: C.RIGHT
+}
+
 document.addEventListener('keydown', function (e) {
-  switch (e.keyCode) {
-    case KEY.S: game.onChangeDir(socket, C.DOWN)
-  }
+  const dir = DIR_FOR_KEY[e.keyCode]
+  if (dir == null) return
+  socket.emit('changeDir', dir)
 })
