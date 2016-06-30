@@ -1,15 +1,16 @@
 // server.js
-
+const app = require('express')()
+const http = require('http').Server(app)
+const io = require('socket.io')(http)
 const {Game} = require('../src/Game.js')
 
-const server = require('http').createServer()
-const io = require('socket.io')(server)
-const PORT = 3000
+// const server = require('http').createServer()
+const PORT = process.env.PORT || 3000
 
 var game = new Game()
 
-function onChangeDir (dir) {
-  game.onChangeDir(this, dir)
+function onChangeDir (dir, nTurn) {
+  game.onChangeDir(this, dir, nTurn)
 }
 
 function onDisconnect () {
@@ -23,9 +24,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', onDisconnect)
 })
 
-server.listen(PORT, () => console.log(`listening on ${PORT}`))
+// server.listen(PORT, () => console.log(`listening on ${PORT}`))
+
+http.listen(PORT, function () {
+  console.log('listening on *:3000')
+})
 
 setInterval(function () {
-  game.nextTurn()
+  game.tick()
   console.log('Step')
-}, 10)
+}, 50)

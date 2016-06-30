@@ -82,5 +82,5 @@ document.addEventListener('keydown', function (e) {
   }
   if (dir === null) return
   console.log(dir)
-  socket.emit('changeDir', dir)
+  socket.emit('changeDir', dir, game.nTurn)
 })

@@ -8,6 +8,27 @@ class Game {
     this.turn = new Turn(matrix, [], [])
     this.players = {}
     this.sockets = []
+    this.currentTurn = 0
+    this.turns = []
+    this.turns[this.currentTurn] = this.turn
+    this.running = false
+  }
+
+  restartGame () {
+    this.sockets.forEach((s) => {
+      if (s == null) return
+      let pos = this.players[s.id]
+      if (!(this.turn.bikes[pos]) || this.turn.bikes[pos].alive) return
+      let x = Math.floor(Math.random() * (this.turn.board[0].length - 1))
+      let y = Math.floor(Math.random() * (this.turn.board.length - 1))
+      this.turn.inputs[pos] = null
+      this.turn.bikes[pos] = { i: y, j: x, dir: C.DOWN, alive: true }
+      this.turn.board[y][x] = pos + 1
+    })
+    this.currentTurn = 0
+    this.turns = []
+    this.turns[this.currentTurn] = this.turn
+    this.running = true
   }
 
   onPlayerJoin (socket) {
@@ -25,21 +46,23 @@ class Game {
     }
 
     if (pos !== null) {
-      this.turn.bikes[pos] = { i: y, j: x, dir: C.DOWN, alive: true }
-      this.turn.inputs[pos] = null
-      this.players[socketid] = pos
       this.sockets[pos] = socket
-      this.turn.board[y][x] = pos + 1
+      this.players[socketid] = pos
+      if (this.currentTurn === 0) {
+        this.turn.board[y][x] = pos + 1
+        this.turn.bikes[pos] = { i: y, j: x, dir: C.DOWN, alive: true }
+        this.turn.inputs[pos] = null
+      }
     } else {
-      this.turn.bikes.push({ i: y, j: x, dir: C.DOWN, alive: true })
-      this.turn.inputs.push(null)
-      this.players[socketid] = this.turn.inputs.length - 1
+      this.players[socketid] = this.turn.inputs.length
       this.sockets.push(socket)
-      this.turn.board[y][x] = this.turn.inputs.length
+      if (this.currentTurn === 0) {
+        this.turn.bikes.push({ i: y, j: x, dir: C.DOWN, alive: true })
+        this.turn.inputs.push(null)
+        this.turn.board[y][x] = this.turn.inputs.length
+      }
     }
-    this.sockets.forEach((s) => {
-      if (s) s.emit('game:state', {turn: this.turn, players: this.players})
-    })
+    this.sendState()
   }
 
   onPlayerLeave (socket) {
@@ -49,14 +72,40 @@ class Game {
     this.turn.setInput(pos, C.SELF_DESTRUCT)
   }
 
-  onChangeDir (socket, dir) {
-    this.turn.setInput(this.players[socket.id], dir)
+  onChangeDir (socket, dir, nTurn) {
+    if (nTurn !== undefined && nTurn !== this.currentTurn) {
+      console.log(`va tarde ${nTurn} y debería ser el ${this.currentTurn}`)
+      let auxTurn = this.turns[nTurn]
+      if (auxTurn === undefined) {
+        console.log('el turno que ha pedido no existe')
+        return
+      }
+      auxTurn.setInput(this.players[socket.id], dir)
+      for (let i = nTurn + 1; i <= this.currentTurn; ++i) {
+        auxTurn = auxTurn.evolve()
+        this.turns[i] = auxTurn
+      }
+      this.turn = auxTurn
+    } else {
+      this.turn.setInput(this.players[socket.id], dir)
+    }
   }
 
-  nextTurn () {
+  tick () {
+    if (this.turn.bikes.filter((b) => b.alive).length <= 1) {
+      if (this.running) this.restartGame()
+      return
+    } else if (!this.running) this.restartGame()
     this.turn = this.turn.evolve()
+    this.currentTurn += 1
+    this.sendState()
+    this.turns[this.currentTurn] = this.turn
+    // delete this.turns[this.currentTurn - 200]
+  }
+
+  sendState () {
     this.sockets.forEach((s) => {
-      if (s) s.emit('game:state', {turn: this.turn, players: this.players})
+      if (s) s.emit('game:state', {turn: this.turn, players: this.players, nTurn: this.currentTurn})
     })
   }
 }

@@ -1,7 +1,11 @@
 const io = require('socket.io-client')
-const socket = io('http://localhost:3000')
+const SERVER_IP = 'http://localhost:3000'
+// const SERVER_IP = 'http://mog2016-tron.herokuapp.com/'
+var socket = io(SERVER_IP)
 const C = require('./constants')
 // const {Game} = require('./Game.js')
+
+var following = false
 
 const IncForDir = {
   [C.RIGHT]: {i: 0, j: 1},
@@ -18,15 +22,35 @@ function goodTile (board, i, j) {
 
 function onGameState (game) {
   let myId = game.players['/#' + this.id]
-  let bike = game.turn.bikes[myId]
-  let myDir = bike.dir
-  if (goodTile(game.turn.board, bike.i + IncForDir[myDir].i, bike.j + IncForDir[myDir].j)) return
-  else {
-    myDir = (myDir + 1) % 4
-    socket.emit('changeDir', myDir)
+  if (myId == null) {
+    following = false
+    return
   }
+  let bike = game.turn.bikes[myId]
+  if (bike == null) {
+    following = false
+    return
+  }
+  if (!bike.alive) {
+    console.log('ha muerto... waiting')
+    following = false
+    return
+  }
+  if (bike.i == null || bike.j == null) return
+  let myDir = ((bike.dir + (following ? 1 : 0)) + 4) % 4
+  let i = 0
+  // let inc = Math.random() < 0.5 ? -1 : 1
+  let inc = -1
+  while (!(goodTile(game.turn.board, bike.i + IncForDir[myDir].i, bike.j + IncForDir[myDir].j)) && i++ < 4) {
+    myDir = ((myDir + inc) + 4) % 4
+    following = true
+    // console.log('No era buena la primera')
+  }
+  socket.emit('changeDir', myDir)
+  // console.log(bike, myDir)
 }
 
 socket.on('connect', () => {
   socket.on('game:state', onGameState)
+  console.log('connected')
 })
