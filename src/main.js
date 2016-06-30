@@ -5,15 +5,25 @@ const io = require('socket.io-client')
 const socket = io()
 const {Game} = require('./Game.js')
 
+var interval
+
 var game = new Game()
 
 function onGameState (g) {
   game = g
 }
 
+function onInterval (i) {
+  interval = i
+  setInterval(function () {
+    game.tick()
+  }, interval)
+}
+
 socket.on('connect', () => {
   socket.on('ok', () => console.log('all good'))
   socket.on('game:state', onGameState)
+  socket.on('interval', onInterval)
 })
 
 // const { Turn } = require('./Turn.js')

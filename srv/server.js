@@ -5,6 +5,8 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const {Game} = require('../src/Game.js')
 
+const interval = 200
+
 app.use(express.static('dist'))
 app.get('/', function (req, res) {
   res.sendfile('../dist/index.html')
@@ -25,6 +27,7 @@ function onDisconnect () {
 io.on('connection', (socket) => {
   console.log(`a socket with id ${socket.id} connected`)
   game.onPlayerJoin(socket)
+  socket.emit('interval', interval)
   socket.on('changeDir', onChangeDir)
   socket.on('disconnect', onDisconnect)
 })
@@ -38,4 +41,4 @@ http.listen(PORT, function () {
 setInterval(function () {
   game.tick()
   // console.log('Step')
-}, 200)
+}, interval)
