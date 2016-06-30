@@ -88,6 +88,7 @@ class Game {
       auxTurn.setInput(this.players[socket.id], dir)
       for (let i = nTurn + 1; i <= this.currentTurn; ++i) {
         auxTurn = auxTurn.evolve()
+        auxTurn.inputs = this.turns[i].inputs
         this.turns[i] = auxTurn
       }
       this.turn = auxTurn
