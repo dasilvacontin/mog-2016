@@ -2,7 +2,7 @@
   "name": "mog-2016",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "build": "browserify src/client.js -o dist/bundle.js && echo 'built!'",
     "watch": "chokidar 'src/**/*.js' 'test/**/*.js' -c 'npm test && npm run build'",
