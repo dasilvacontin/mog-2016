@@ -1,6 +1,7 @@
 const io = require('socket.io-client')
-const SERVER_IP = 'http://localhost:3000'
+// const SERVER_IP = 'http://localhost:3000'
 // const SERVER_IP = 'http://mog2016-tron.herokuapp.com/'
+const SERVER_IP = 'https://lit-waters-26157.herokuapp.com/'
 var socket = io(SERVER_IP)
 const C = require('./constants')
 // const {Game} = require('./Game.js')
