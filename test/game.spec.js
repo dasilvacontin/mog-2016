@@ -70,6 +70,7 @@ test('Game :: onPlayerJoin', (t) => {
     socket2.once('game:state', stateUpdate)
 
     game.onPlayerJoin(socket2)
+    console.log(game.turn.board)
     t.ok(boardHasCells(board, [1, 2]), 'should place players on the board')
     t.equal(bikes.length, 2, "should update turn's bikes")
     t.deepEqual(inputs, [null, null], "should update turn's inputs")

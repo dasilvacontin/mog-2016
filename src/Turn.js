@@ -15,6 +15,9 @@ class Turn {
     var newInputs = []
     for (var i = 0; i < this.bikes.length; i++) {
       if (!(this.inputs[i] === null) && newBikes[i].alive) {
+        if (this.inputs[i] === C.SELF_DESTRUCT) {
+          newBikes[i].alive = false
+        }
         if (this.inputs[i] === C.UP & this.bikes[i].dir !== C.DOWN) {
           newBikes[i].dir = this.inputs[i]
         }
