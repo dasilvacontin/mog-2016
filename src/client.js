@@ -15,7 +15,7 @@ myCanvas.width = window.innerWidth
 myCanvas.height = window.innerHeight
 const ctx = myCanvas.getContext('2d')
 
-const colors = ['black', 'blue', 'red']
+const colors = ['black', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
 
 function renderGame () {
   const turn = game.turn
