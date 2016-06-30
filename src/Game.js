@@ -12,7 +12,8 @@ class Game {
 
   onPlayerJoin (socket) {
     let bikeId = 0
-    while (this.sockets[bikeId] != null) ++bikeId
+    while (this.sockets[bikeId] != null ||
+      this.turn.inputs[bikeId] != null) ++bikeId
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
     this.turn.addPlayer(bikeId)
