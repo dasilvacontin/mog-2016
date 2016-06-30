@@ -106,9 +106,9 @@ test('Game :: Player joins started game', (t) => {
 
   const socket3 = fakeSocket()
   game.onPlayerJoin(socket3)
-  t.notOk(boardHasCells(game.turn.board, [3]), 'player shouldnt be placed on the board')
-  t.equal(game.turn.bikes.length, 2, 'a bike should not be created')
-  t.equal(game.turn.inputs.length, 2, 'doesnt require an input')
+  t.notOk(boardHasCells(game.turn.board, [3]), 'if game has started, player shouldnt be placed on the board')
+  t.equal(game.turn.bikes.length, 2, 'if game has started, a bike should not be created')
+  t.equal(game.turn.inputs.length, 2, 'if game has started, player doesnt require an input')
   t.deepEqual(
     game.sockets.map(socket => socket.id),
     [socket, socket2, socket3].map(socket => socket.id),
@@ -232,5 +232,7 @@ test('Game :: tick', (t) => {
   game.turn.bikes.forEach(bike => { bike.alive = false })
   game.tick()
   t.equal(game.turns.length, 1, 'should reset turns array when game restarts')
+  t.equal(game.turn.bikes.length, 2, 'there should be two bikes')
+  t.ok(game.turn.bikes.every(bike => bike.alive), 'every bike should be alive')
   t.end()
 })
