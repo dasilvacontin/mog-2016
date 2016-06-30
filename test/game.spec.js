@@ -208,3 +208,29 @@ test('Game :: onPlayerLeave', (t) => {
 
   t.end()
 })
+
+test('Game :: tick', (t) => {
+  const game = new Game()
+
+  game.tick()
+  t.equal(game.turns.length, 1, 'shouldnt start the game with < 2 players')
+
+  const socket1 = fakeSocket()
+  game.onPlayerJoin(socket1)
+  game.tick()
+  t.equal(game.turns.length, 1, 'shouldnt start the game with < 2 players')
+
+  const socket2 = fakeSocket()
+  game.onPlayerJoin(socket2)
+
+  const oldTurn = game.turn
+  game.tick()
+  t.notEqual(game.turn, oldTurn, 'should update `this.turn` ref')
+  t.equal(game.turns[1], game.turn, 'turn should be last turn in turns array')
+  t.equal(game.turns.length, 2, 'should push new turn into turns array')
+
+  game.turn.bikes.forEach(bike => { bike.alive = false })
+  game.tick()
+  t.equal(game.turns.length, 1, 'should reset turns array when game restarts')
+  t.end()
+})
