@@ -1,17 +1,5 @@
+'use strict'
 const C = require('./constants.js')
-
-function removeBike (board, bikeid, i, j) {
-  if (j < 0 || i < 0 || i >= board.length || j >= board[i].length) return
-  const c = board[i][j]
-  if (c === bikeid) {
-    board[i][j] = C.EMPTY_CELL
-    removeBike(board, bikeid, i + 1, j)
-    removeBike(board, bikeid, i - 1, j)
-    removeBike(board, bikeid, i, j + 1)
-    removeBike(board, bikeid, i, j - 1)
-  }
-  return
-}
 
 class Turn {
   constructor (board, bikes, inputs) {
@@ -33,9 +21,7 @@ class Turn {
       const input = this.inputs[i]
       if (input === C.SELF_DESTRUCT) bike.alive = false
       if (bike.alive) {
-        if (input != null && this.isNotOppositeDirection(input, bike.dir)) {
-          bike.dir = input
-        }
+        if (input != null && isNotOppositeDirection(input, bike.dir)) bike.dir = input
         bike.i += C.VECTOR_DIR[bike.dir].i
         bike.j += C.VECTOR_DIR[bike.dir].j
         // Out of bounds
@@ -71,8 +57,39 @@ class Turn {
     return new Turn(tempBoard, tempBikes, newInputs)
   }
 
-  isNotOppositeDirection (d, b) {
-    return !(d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN)
+  addBike (bikeId) {
+    var initPos = getRandomEmptyPosition(this.board)
+    this.bikes[bikeId] = { i: initPos.i, j: initPos.j, dir: getRandomInt(0, 3), alive: true }
+    this.board[initPos.i][initPos.j] = bikeId + 1
+    this.inputs[bikeId] = null
   }
 }
 exports.Turn = Turn
+
+function removeBike (board, bikeid, i, j) {
+  if (j < 0 || i < 0 || i >= board.length || j >= board[i].length) return
+  const c = board[i][j]
+  if (c === bikeid) {
+    board[i][j] = C.EMPTY_CELL
+    removeBike(board, bikeid, i + 1, j)
+    removeBike(board, bikeid, i - 1, j)
+    removeBike(board, bikeid, i, j + 1)
+    removeBike(board, bikeid, i, j - 1)
+  }
+  return
+}
+
+function getRandomInt (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function getRandomEmptyPosition (board) {
+  do {
+    var result = { i: getRandomInt(0, board.length - 1), j: getRandomInt(0, board[0].length) }
+  } while (board[result.i][result.j] !== C.EMPTY_CELL)
+  return result
+}
+
+function isNotOppositeDirection (d, b) {
+  return !(d + b === C.LEFT + C.RIGHT || d + b === C.UP + C.DOWN)
+}
