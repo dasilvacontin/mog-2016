@@ -10,7 +10,9 @@ socket.on('game:state', (state) => {
   game.turn = state.turn
 })
 
-const edge = 50
+const edge = 10
+const offset = 1
+
 myCanvas.width = window.innerWidth
 myCanvas.height = window.innerHeight
 const ctx = myCanvas.getContext('2d')
@@ -25,7 +27,7 @@ function renderGame () {
       const cell = row[j]
       const color = colors[cell]
       ctx.fillStyle = color
-      ctx.fillRect(j * (edge + 5), i * (edge + 5), edge, edge)
+      ctx.fillRect(j * (edge + offset), i * (edge + offset), edge, edge)
     }
   }
 }
