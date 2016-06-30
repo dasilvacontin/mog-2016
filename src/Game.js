@@ -8,6 +8,7 @@ class Game {
     this.turns = [this.turn]
     this.players = {}
     this.sockets = []
+    this.started = false
   }
 
   onPlayerJoin (socket) {
@@ -15,7 +16,9 @@ class Game {
     while (this.sockets[bikeId] != null || this.turn.inputs[bikeId] != null) ++bikeId
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
-    this.turn.addPlayer(bikeId)
+    if (!this.started) {
+      this.turn.addPlayer(bikeId)
+    }
     this.sendState()
   }
 
@@ -30,9 +33,23 @@ class Game {
 
     delete this.players[socket.id]
     this.sockets[bikeId] = null
+    // check whether there are players on the board
+    this.started = false
+    for (let i = 0; i < this.players.length; ++i) {
+      this.started = this.players[i] != null
+    }
   }
 
   tick () {
+    // check whether there are players on the board, minimum 2
+    this.started = false
+    let count = 0
+    for (let i = 0; i < this.sockets.length; ++i) {
+      if (this.sockets[i] != null) {
+        ++count
+      }
+    }
+    this.started = count >= 2
     const nextTurn = this.turn.evolve()
     this.turns.push(nextTurn)
     this.turn = nextTurn
