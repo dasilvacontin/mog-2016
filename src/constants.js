@@ -6,5 +6,6 @@ module.exports = {
   DOWN: 1,
   LEFT: 2,
   UP: 3,
-  SELF_DESTRUCT: 4
+  SELF_DESTRUCT: 4,
+  MIN_PLAYERS: 2
 }
