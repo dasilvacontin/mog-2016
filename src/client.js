@@ -1,4 +1,4 @@
-/* global myCanvas */
+/* global myCanvas, requestAnimationFrame */
 const io = require('socket.io-client')
 const { Game } = require('./Game.js')
 const C = require('./constants.js')
@@ -19,7 +19,10 @@ const ctx = myCanvas.getContext('2d')
 
 const colors = ['black', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
 
+requestAnimationFrame(renderGame)
 function renderGame () {
+  requestAnimationFrame(renderGame)
+
   const turn = game.turn
   for (let i = 0; i < turn.board.length; ++i) {
     const row = turn.board[i]
@@ -31,9 +34,6 @@ function renderGame () {
     }
   }
 }
-
-renderGame()
-setInterval(function () { renderGame() }, 500)
 
 const KEY = {
   W: 87,
