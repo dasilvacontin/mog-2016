@@ -236,3 +236,34 @@ test('Game :: tick', (t) => {
   t.ok(game.turn.bikes.every(bike => bike.alive), 'every bike should be alive')
   t.end()
 })
+
+test('Game :: Restart with less players', (t) => {
+  const socket1 = fakeSocket()
+  const socket2 = fakeSocket()
+  const socket3 = fakeSocket()
+  const game = new Game()
+  game.onPlayerJoin(socket1)
+  game.onPlayerJoin(socket2)
+  game.onPlayerJoin(socket3)
+
+  game.tick()
+  game.turn.bikes.forEach(bike => { bike.alive = false })
+  game.onPlayerLeave(socket2)
+  game.tick()
+
+  const { turn, players, sockets } = game
+  const { board, bikes, inputs } = turn
+  t.deepEqual(
+    socket.map(socket => socket && socket.id),
+    [socket1.id, null, socket3.id],
+    'should leave an empty slot in sockets array')
+  t.equal(bikes[1], null,
+    'should leave empty slot in bikes array')
+  t.deepEqual(players, {
+    [socket1.id]: 0,
+    [socket3.id]: 2
+  }, 'socket2 should no longer be in players hash')
+
+  t.doesNotThrow(game.tick.bind(game),
+    'it should take into account nulls in array')
+})
