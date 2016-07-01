@@ -10,6 +10,8 @@ const socket = io()
 
 let sentPing
 let ping = ''
+// client's Date.now() - server's Date.now()
+let clientLead = 0
 
 function sendPing () {
   sentPing = Date.now()
@@ -17,9 +19,10 @@ function sendPing () {
 }
 sendPing()
 
-socket.on('game:pong', () => {
+socket.on('game:pong', (serverNow) => {
   ping = (Date.now() - sentPing) / 2
-  console.log(ping)
+  clientLead = Date.now() - (serverNow + ping)
+  console.log({ ping, clientLead })
   setTimeout(sendPing, 500)
 })
 

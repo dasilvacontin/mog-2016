@@ -28,7 +28,7 @@ io.on('connection', function (socket) {
     game.onPlayerLeave(socket)
   })
 
-  socket.on('game:ping', () => socket.emit('game:pong'))
+  socket.on('game:ping', () => socket.emit('game:pong', Date.now()))
 })
 
 const PORT = process.env.PORT || 3000
