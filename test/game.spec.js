@@ -309,12 +309,17 @@ test('Game :: change dir for past turn', (t) => {
 
   game.tick()
   game.tick()
+  // socket1 is requesting to change input to C.LEFT
+  // for turn #3, which is index 2 in turns array
+  // (which is also the current turn)
   game.onChangeDir(socket1, C.LEFT, 2)
 
   let stateReceived = 0
   socket1.once('game:state', () => stateReceived++)
   socket2.once('game:state', () => stateReceived++)
 
+  // socket2 is requesting to change input to C.RIGHT
+  // for turn #2, which is index 1 in turns array
   game.onChangeDir(socket2, C.RIGHT, 1)
   t.equal(stateReceived, 2, 'players should have been notified of resimulation')
   t.equal(game.turn.board[1][2], 2, 'player two should have moved right on turn 2')
