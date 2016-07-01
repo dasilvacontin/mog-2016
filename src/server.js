@@ -28,6 +28,10 @@ io.on('connection', function (socket) {
     game.onPlayerLeave(socket)
   })
 
+  socket.on('chatMessage', (content) => {
+    io.sockets.emit('chatMessage', content)
+  })
+
   socket.on('game:ping', () => socket.emit('game:pong', Date.now()))
 })
 

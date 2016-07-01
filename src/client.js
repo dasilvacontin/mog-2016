@@ -52,6 +52,12 @@ socket.on('changeDir', (socketId, dir, turnIndex) => {
   game.onChangeDir({ id: socketId }, dir, turnIndex)
 })
 
+socket.on('chatMessage', (content) => {
+  const messageDOM = document.createElement('p')
+  messageDOM.innerHTML = escapeHTML(`Anon: ${content}`)
+  chatContainer.appendChild(messageDOM)
+})
+
 const edge = 10
 const offset = 1
 
@@ -59,7 +65,8 @@ myCanvas.width = window.innerWidth
 myCanvas.height = window.innerHeight
 const ctx = myCanvas.getContext('2d')
 
-const colors = ['black', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
+const colors = ['#F8F8F8', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
+global.tronColors = colors
 
 requestAnimationFrame(loop)
 function loop () {
@@ -126,20 +133,27 @@ document.addEventListener('keydown', function (e) {
  * #/iuoasdufhna8s3286
  */
 
+var escape = document.createElement('textarea')
+function escapeHTML (html) {
+  escape.textContent = html
+  return escape.innerHTML
+}
+
 function sendMessage () {
   let content = chatInput.value.trim()
   chatInput.value = ''
   if (content.length === 0) return
 
-  if (content === '/debug on') debugEnabled = true
-  else debugEnabled = false
+  if (content === '/debug on') {
+    debugEnabled = true
+    return
+  } else if (content === '/debug off') {
+    debugEnabled = false
+    return
+  }
+
   console.log('debugEnabled', debugEnabled)
-
   socket.emit('chatMessage', content)
-
-  const messageDOM = document.createElement('p')
-  messageDOM.innerHTML = `Anon: ${content}`
-  chatContainer.appendChild(messageDOM)
 }
 global.sendMessage = sendMessage
 
