@@ -215,6 +215,7 @@ test('Turn :: Self-Destruct', (t) => {
   const turn = new Turn(board, bikes, inputs)
 
   turn.setInput(0, C.SELF_DESTRUCT)
+  t.equal(turn.bikes[0].alive, true, 'bike shouldnt self-destruct til turn evolves')
   const nextTurn = turn.evolve()
   t.equal(nextTurn.bikes[0].alive, false, 'the bike should break down')
   t.deepEqual(nextTurn.board, [
