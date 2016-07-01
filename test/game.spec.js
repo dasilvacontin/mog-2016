@@ -291,7 +291,7 @@ test('Game :: change dir for past turn', (t) => {
   const turn = new Turn([
     [1, 2, 0],
     [0, 0, 0],
-    [0, 0, 0]
+    [0, 1, 0]
   ], [
     {i: 0, j: 0, dir: C.DOWN, alive: true},
     {i: 0, j: 1, dir: C.DOWN, alive: true}
@@ -315,5 +315,8 @@ test('Game :: change dir for past turn', (t) => {
   t.equal(game.turn.board[1][2], 2, 'player two should have moved right on turn 2')
   t.deepEqual(game.turns[1].input, [null, C.RIGHT])
   t.deepEqual(game.turns[2].input, [C.LEFT, null])
+  t.equal(game.turn.bikes[1].i, 1, 'bike pos in turn 2 should be (2,1)')
+  t.equal(game.turn.bikes[1].j, 2, 'bike pos in turn 2 should be (2,1)')
+  t.equal(game.turn.bikes[1].alive, true, 'bike should be alive in resimulation')
   t.end()
 })
