@@ -4,8 +4,8 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const { Game } = require('./Game.js')
 
-const game = new Game({ size: 30 })
-setInterval(game.tick.bind(game), 300)
+const game = new Game({ size: 50, interval: 100 })
+game.startInterval()
 
 app.use(express.static('dist'))
 app.get('/', function (req, res) {

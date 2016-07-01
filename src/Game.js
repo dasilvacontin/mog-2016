@@ -2,12 +2,19 @@ const { Turn } = require('../src/Turn.js')
 const C = require('../src/constants.js')
 
 class Game {
-  constructor ({ size = 10 } = {}) {
+  constructor ({ size = 20, interval = 100 } = {}) {
     const board = Array(size).fill().map(() => Array(size).fill(C.EMPTY_CELL))
     this.turn = new Turn(board, [], [])
     this.turns = [this.turn]
     this.players = {}
     this.sockets = []
+    this.interval = interval
+  }
+
+  startInterval () {
+    setInterval(() => {
+      this.tick()
+    }, this.interval)
   }
 
   hasStarted () {
@@ -89,7 +96,8 @@ class Game {
 
     const state = {
       turn: this.turn,
-      players: this.players
+      players: this.players,
+      interval: this.interval
     }
 
     this.sockets.forEach((socket) => {

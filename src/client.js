@@ -19,7 +19,7 @@ socket.on('game:state', (state, turnIndex) => {
   clearInterval(intervalId)
   intervalId = setInterval(() => {
     game.tick()
-  }, 300)
+  }, state.interval)
 })
 
 socket.on('changeDir', (socketId, dir, turnIndex) => {
