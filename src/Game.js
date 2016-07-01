@@ -86,7 +86,11 @@ class Game {
       turn: this.turn,
       players: this.players
     }
-    this.sockets.forEach((socket) => socket && socket.emit('game:state', state))
+
+    const turnIndex = this.turns.length - 1
+    this.sockets.forEach((socket) => {
+      if (socket) socket.emit('game:state', state, turnIndex)
+    })
   }
 }
 exports.Game = Game

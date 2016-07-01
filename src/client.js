@@ -4,10 +4,13 @@ const { Game } = require('./Game.js')
 const C = require('./constants.js')
 
 const game = new Game()
+game.turns = []
 const socket = io()
-socket.on('game:state', (state) => {
+socket.on('game:state', (state, turnIndex) => {
   game.players = state.players
   game.turn = state.turn
+  if (turnIndex < game.turns.length) game.turns = []
+  game.turns[turnIndex] = state.turn
 })
 
 const edge = 10
@@ -52,5 +55,6 @@ const DIR_FOR_KEY = {
 document.addEventListener('keydown', function (e) {
   const dir = DIR_FOR_KEY[e.keyCode]
   if (dir == null) return
-  socket.emit('changeDir', dir)
+  const turnIndex = game.turns.length - 1
+  socket.emit('changeDir', dir, turnIndex)
 })
