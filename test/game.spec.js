@@ -1,6 +1,7 @@
 const test = require('tape')
 const EventEmitter = require('events')
 const shortid = require('shortid')
+const clone = require('clone')
 
 const { Game } = require('../src/Game.js')
 const C = require('../src/constants.js')
@@ -94,6 +95,64 @@ test('Game :: onPlayerJoin', (t) => {
     'should store socket in sockets array')
 })
 
+test('Game :: Player joins started game', (t) => {
+  const game = new Game()
+  const socket = fakeSocket()
+  const socket2 = fakeSocket()
+
+  game.onPlayerJoin(socket)
+  game.onPlayerJoin(socket2)
+  game.tick()
+
+  const socket3 = fakeSocket()
+  game.onPlayerJoin(socket3)
+  t.notOk(boardHasCells(game.turn.board, [3]), 'if game has started, player shouldnt be placed on the board')
+  t.equal(game.turn.bikes.length, 2, 'if game has started, a bike should not be created')
+  t.equal(game.turn.inputs.length, 2, 'if game has started, player doesnt require an input')
+  t.deepEqual(
+    game.sockets.map(socket => socket.id),
+    [socket, socket2, socket3].map(socket => socket.id),
+    'should store socket in sockets array')
+
+  t.end()
+})
+
+test('Game :: Player fills free slot in started game', (t) => {
+  const game = new Game()
+  const socket1 = fakeSocket()
+  const socket2 = fakeSocket()
+  const socket3 = fakeSocket()
+
+  game.onPlayerJoin(socket1)
+  game.onPlayerJoin(socket2)
+  game.onPlayerJoin(socket3)
+  game.tick()
+
+  const { turn, players, sockets } = game
+  const { board, bikes, inputs } = turn
+
+  const oldBike = clone(bikes[1])
+  game.onPlayerLeave(socket2)
+  const socket4 = fakeSocket()
+  game.onPlayerJoin(socket4)
+
+  t.deepEqual(players, {
+    [socket1.id]: 0,
+    [socket4.id]: 1,
+    [socket3.id]: 2
+  }, 'should fill free slot in players')
+  t.deepEqual(
+    sockets.map(socket => socket && socket.id),
+    [socket1.id, socket4.id, socket3.id],
+    'should fill free slot in sockets')
+  t.ok(boardHasCells(board, [1, 2, 3]),
+    'bike from player who just left should still be there on the map')
+  t.deepEqual(bikes[1], oldBike, 'bike shouldnt have been modified')
+  t.ok(bikes[1].alive, 'bike should still be alive til next tick')
+  t.deepEqual(inputs, [null, C.SELF_DESTRUCT, null], "joined bike shouldnt overwrite old bike's input")
+  t.end()
+})
+
 test('Game :: onChangeDir', (t) => {
   const game = new Game()
   const { inputs } = game.turn
@@ -147,5 +206,66 @@ test('Game :: onPlayerLeave', (t) => {
     [null, socket2.id],
     'should free up the slot in the sockets array')
 
+  t.end()
+})
+
+test('Game :: tick', (t) => {
+  const game = new Game()
+
+  game.tick()
+  t.equal(game.turns.length, 1, 'shouldnt start the game with < 2 players')
+
+  const socket1 = fakeSocket()
+  game.onPlayerJoin(socket1)
+  game.tick()
+  t.equal(game.turns.length, 1, 'shouldnt start the game with < 2 players')
+
+  const socket2 = fakeSocket()
+  game.onPlayerJoin(socket2)
+
+  const oldTurn = game.turn
+  game.tick()
+  t.notEqual(game.turn, oldTurn, 'should update `this.turn` ref')
+  t.equal(game.turns[1], game.turn, 'turn should be last turn in turns array')
+  t.equal(game.turns.length, 2, 'should push new turn into turns array')
+
+  game.turn.bikes.forEach(bike => { bike.alive = false })
+  game.tick()
+  t.equal(game.turns.length, 1, 'should reset turns array when game restarts')
+  t.equal(game.turn.bikes.length, 2, 'there should be two bikes')
+  t.ok(game.turn.bikes.every(bike => bike.alive), 'every bike should be alive')
+  t.end()
+})
+
+test('Game :: Restart with less players', (t) => {
+  const socket1 = fakeSocket()
+  const socket2 = fakeSocket()
+  const socket3 = fakeSocket()
+  const game = new Game()
+  game.onPlayerJoin(socket1)
+  game.onPlayerJoin(socket2)
+  game.onPlayerJoin(socket3)
+
+  game.tick()
+  game.turn.bikes.forEach(bike => { bike.alive = false })
+  game.onPlayerLeave(socket2)
+  game.tick()
+
+  const { turn, players, sockets } = game
+  const { bikes, inputs } = turn
+  t.deepEqual(
+    sockets.map(socket => socket && socket.id),
+    [socket1.id, null, socket3.id],
+    'should leave an empty slot in sockets array')
+  t.equal(bikes[1], null,
+    'should leave empty slot in bikes array')
+  t.equal(inputs.length, 3,
+    'inputs should leave a gap for the missing player')
+  t.deepEqual(players, {
+    [socket1.id]: 0,
+    [socket3.id]: 2
+  }, 'socket2 should no longer be in players hash')
+  t.doesNotThrow(game.tick.bind(game),
+    'it should take into account nulls in array')
   t.end()
 })
