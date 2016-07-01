@@ -30,13 +30,14 @@ function directionsAreOpposite (dir1, dir2) {
 }
 
 class Turn {
-  constructor (board, bikes, inputs) {
+  constructor (board = [], bikes = [], inputs = []) {
     this.board = board
     this.bikes = bikes
     this.inputs = inputs
   }
 
   setInput (playerIndex, dir) {
+    if (this.inputs[playerIndex] === C.SELF_DESTRUCT) return
     this.inputs[playerIndex] = dir
   }
 
@@ -55,6 +56,7 @@ class Turn {
     const collisions = {}
 
     bikes.forEach((bike, i) => {
+      if (!bike) return
       if (!bike.alive) return
 
       const input = inputs[i]
@@ -103,6 +105,7 @@ class Turn {
     // move bikes on the board, remove dead bikes
     const oldBikes = this.bikes
     bikes.forEach((bike, i) => {
+      if (!bike) return
       if (bike.alive) board[bike.i][bike.j] = i + 1
       else {
         const oldBike = oldBikes[i]
@@ -113,15 +116,41 @@ class Turn {
     return nextTurn
   }
 
+  dirForPos (i, j) {
+    const width = this.board[0].length
+    const height = this.board.length
+
+    // get minimum distance to board border for each axis
+    const ci = Math.min(i + 1, height - i)
+    const cj = Math.min(j + 1, width - j)
+
+    let dir
+    if (ci < cj) {
+      // i is closer to edge
+      if (i < height / 2) dir = C.DOWN
+      else dir = C.UP
+    } else {
+      // j is closer to edge
+      if (j < width / 2) dir = C.RIGHT
+      else dir = C.LEFT
+    }
+    return dir
+  }
+
   addPlayer (bikeId) {
+    const width = this.board[0].length
+    const height = this.board.length
+
     let i = -1
     let j = -1
     while (getCell(this.board, i, j) !== C.EMPTY_CELL) {
-      i = Math.floor(Math.random() * this.board.length)
-      j = Math.floor(Math.random() * this.board[0].length)
+      i = Math.floor(Math.random() * height)
+      j = Math.floor(Math.random() * width)
     }
 
-    const dir = Math.floor(Math.random() * 4)
+    let dir = this.dirForPos(i, j)
+    dir = Math.floor(Math.random() * 4)
+
     const bike = { i, j, dir, alive: true }
     this.bikes[bikeId] = bike
     this.board[i][j] = bikeId + 1

@@ -10,13 +10,23 @@ class Game {
     this.sockets = []
   }
 
+  hasStarted () {
+    return this.turns.length > 1
+  }
+
+  canGameStart () {
+    const connected = this.sockets.filter(socket => {
+      return socket
+    })
+    return connected.length > 1
+  }
+
   onPlayerJoin (socket) {
     let bikeId = 0
-    while (this.sockets[bikeId] != null ||
-      this.turn.inputs[bikeId] != null) ++bikeId
+    while (this.sockets[bikeId] != null) ++bikeId
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
-    this.turn.addPlayer(bikeId)
+    if (!this.hasStarted()) this.turn.addPlayer(bikeId)
     this.sendState()
   }
 
@@ -34,10 +44,26 @@ class Game {
   }
 
   tick () {
-    const nextTurn = this.turn.evolve()
-    this.turns.push(nextTurn)
-    this.turn = nextTurn
-    this.sendState()
+    if (this.hasStarted() || this.canGameStart()) {
+      const aliveBikes = this.turn.bikes.filter(bike => bike && bike.alive)
+      let nextTurn
+
+      if (aliveBikes.length < 2) {
+        console.log('new game!')
+        nextTurn = new Turn()
+        nextTurn.board = this.turn.board.map(row => row.map(cell => 0))
+        this.sockets.forEach((socket, i) => {
+          if (socket) nextTurn.addPlayer(i)
+          else nextTurn.bikes[i] = null
+        })
+        nextTurn.inputs = nextTurn.bikes.map(() => null)
+        this.turns = []
+      } else nextTurn = this.turn.evolve()
+
+      this.turns.push(nextTurn)
+      this.turn = nextTurn
+      this.sendState()
+    }
   }
 
   sendState () {
