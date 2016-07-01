@@ -226,4 +226,17 @@ test('Turn :: Self-Destruct', (t) => {
   t.deepEqual(nextTurn.inputs, [null], 'inputs should be reset as always')
   t.end()
 })
+
+test('Turn :: dirForPos', (t) => {
+  const turn = new Turn([
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ])
+  t.equal(turn.dirForPos(0, 1), C.DOWN)
+  t.equal(turn.dirForPos(1, 0), C.RIGHT)
+  t.equal(turn.dirForPos(1, 2), C.LEFT)
+  t.equal(turn.dirForPos(2, 1), C.UP)
+  t.end()
+})
 // const alivePlayers = players.filter(player => player.isAlive())
