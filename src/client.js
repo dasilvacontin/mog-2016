@@ -4,6 +4,7 @@ const { Game } = require('./Game.js')
 const { Turn } = require('./Turn.js')
 const C = require('./constants.js')
 
+let debugTurn = null
 const game = new Game()
 const socket = io()
 let intervalId
@@ -25,7 +26,10 @@ socket.on('game:pong', () => {
 
 socket.on('game:state', (state, turnIndex) => {
   // ignore game states unless they are for turn 0
-  if (turnIndex !== 0) return
+  if (turnIndex !== 0) {
+    debugTurn = state.turn
+    return
+  }
 
   const { board, bikes, inputs } = state.turn
   const turn = new Turn(board, bikes, inputs)
@@ -71,6 +75,12 @@ function renderGame () {
       const color = colors[cell]
       ctx.fillStyle = color
       ctx.fillRect(j * (edge + offset), i * (edge + offset), edge, edge)
+
+      if (!debugTurn) continue
+      const debugCell = debugTurn.board[i][j]
+      const debugColor = colors[debugCell]
+      ctx.fillStyle = debugColor
+      ctx.fillRect(j * (edge + offset), i * (edge + offset), edge/ 2, edge / 2)
     }
   }
 }
