@@ -1,6 +1,8 @@
 const { Turn } = require('../src/Turn.js')
 const C = require('../src/constants.js')
 
+const isServer = typeof window === 'undefined'
+
 class Game {
   constructor ({ size = 20, interval = 100 } = {}) {
     const board = Array(size).fill().map(() => Array(size).fill(C.EMPTY_CELL))
@@ -50,7 +52,7 @@ class Game {
 
   onChangeDir (socket, dir, turnIndex) {
     const emitterId = socket.id
-    if (typeof window === 'undefined') {
+    if (isServer) {
       this.sockets.forEach(socket => socket && socket.emit('changeDir', emitterId, dir, turnIndex))
     }
 
@@ -87,7 +89,7 @@ class Game {
       const aliveBikes = this.turn.bikes.filter(bike => bike && bike.alive)
       let nextTurn
 
-      if (aliveBikes.length < 2) {
+      if (isServer && aliveBikes.length < 2) {
         nextTurn = new Turn()
         nextTurn.board = this.turn.board.map(row => row.map(cell => 0))
         this.sockets.forEach((socket, i) => {
