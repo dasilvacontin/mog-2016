@@ -58,6 +58,7 @@ class Game {
       currTurn = nextTurn
     }
     this.turn = currTurn
+    this.sendState()
   }
 
   onPlayerLeave (socket) {
@@ -92,7 +93,6 @@ class Game {
 
   sendState () {
     const turnIndex = this.turns.length - 1
-    if (turnIndex !== 0) return
 
     const state = {
       turn: this.turn,

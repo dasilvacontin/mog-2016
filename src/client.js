@@ -24,6 +24,9 @@ socket.on('game:pong', () => {
 })
 
 socket.on('game:state', (state, turnIndex) => {
+  // ignore game states unless they are for turn 0
+  if (turnIndex !== 0) return
+
   const { board, bikes, inputs } = state.turn
   const turn = new Turn(board, bikes, inputs)
 
