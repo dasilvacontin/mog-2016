@@ -30,9 +30,24 @@ class Game {
     this.sendState()
   }
 
-  onChangeDir (socket, dir) {
+  onChangeDir (socket, dir, turnIndex) {
+    if (turnIndex == null) turnIndex = this.turns.length - 1
     const bikeId = this.players[socket.id]
-    this.turn.setInput(bikeId, dir)
+
+    const turn = this.turns[turnIndex]
+    if (!turn) return
+    turn.setInput(bikeId, dir)
+
+    let currTurn = turn
+    for (let i = turnIndex + 1; i < this.turns.length; ++i) {
+      let nextTurn = this.turns[i]
+      const nextInputs = nextTurn.inputs
+      nextTurn = currTurn.evolve()
+      nextTurn.inputs = nextInputs
+      this.turns[i] = nextTurn
+      currTurn = nextTurn
+    }
+    this.turn = currTurn
   }
 
   onPlayerLeave (socket) {
