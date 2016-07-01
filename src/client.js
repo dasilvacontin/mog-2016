@@ -8,6 +8,21 @@ const game = new Game()
 const socket = io()
 let intervalId
 
+let sentPing
+let ping = ''
+
+function sendPing () {
+  sentPing = Date.now()
+  socket.emit('game:ping')
+}
+sendPing()
+
+socket.on('game:pong', () => {
+  ping = (Date.now() - sentPing) / 2
+  console.log(ping)
+  setTimeout(sendPing, 500)
+})
+
 socket.on('game:state', (state, turnIndex) => {
   const { board, bikes, inputs } = state.turn
   const turn = new Turn(board, bikes, inputs)
@@ -15,11 +30,13 @@ socket.on('game:state', (state, turnIndex) => {
   game.turn = turn
   game.turns = [turn]
   game.players = state.players
+  game.interval = state.interval
 
   clearInterval(intervalId)
-  intervalId = setInterval(() => {
+  setTimeout(() => {
+    intervalId = setInterval(game.tick.bind(game), game.interval)
     game.tick()
-  }, state.interval)
+  }, game.interval - ping)
 })
 
 socket.on('changeDir', (socketId, dir, turnIndex) => {

@@ -27,6 +27,8 @@ io.on('connection', function (socket) {
   socket.on('disconnect', function () {
     game.onPlayerLeave(socket)
   })
+
+  socket.on('game:ping', () => socket.emit('game:pong'))
 })
 
 const PORT = process.env.PORT || 3000
