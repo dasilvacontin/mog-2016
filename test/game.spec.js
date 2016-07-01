@@ -126,6 +126,18 @@ test('Game :: Player fills free slot in started game', (t) => {
   game.onPlayerJoin(socket1)
   game.onPlayerJoin(socket2)
   game.onPlayerJoin(socket3)
+
+  game.turn.board = [
+    [1, 2, 3],
+    [0, 0, 0]
+  ]
+
+  game.turn.bikes.forEach((bike, k) => {
+    bike.i = 0
+    bike.j = k
+    bike.dir = C.DOWN
+  })
+
   game.tick()
 
   const { turn, players, sockets } = game
