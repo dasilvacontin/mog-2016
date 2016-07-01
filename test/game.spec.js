@@ -302,6 +302,11 @@ test('Game :: change dir for past turn', (t) => {
   game.turn = turn
   game.turns = [turn]
 
+  game.sockets = [socket1, socket2]
+  game.sockets.forEach((socket, i) => {
+    game.players[socket.id] = i
+  })
+
   game.tick()
   game.tick()
   game.onChangeDir(socket1, C.LEFT, 2)
@@ -313,8 +318,8 @@ test('Game :: change dir for past turn', (t) => {
   game.onChangeDir(socket2, C.RIGHT, 1)
   t.equal(stateReceived, 2, 'players should have been notified of resimulation')
   t.equal(game.turn.board[1][2], 2, 'player two should have moved right on turn 2')
-  t.deepEqual(game.turns[1].input, [null, C.RIGHT])
-  t.deepEqual(game.turns[2].input, [C.LEFT, null])
+  t.deepEqual(game.turns[1].inputs, [null, C.RIGHT])
+  t.deepEqual(game.turns[2].inputs, [C.LEFT, null])
   t.equal(game.turn.bikes[1].i, 1, 'bike pos in turn 2 should be (2,1)')
   t.equal(game.turn.bikes[1].j, 2, 'bike pos in turn 2 should be (2,1)')
   t.equal(game.turn.bikes[1].alive, true, 'bike should be alive in resimulation')
