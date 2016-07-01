@@ -1,16 +1,31 @@
 /* global myCanvas, requestAnimationFrame */
 const io = require('socket.io-client')
 const { Game } = require('./Game.js')
+const { Turn } = require('./Turn.js')
 const C = require('./constants.js')
 
 const game = new Game()
-game.turns = []
 const socket = io()
+let intervalId
+
 socket.on('game:state', (state, turnIndex) => {
+  const { board, bikes, inputs } = state.turn
+  const turn = new Turn(board, bikes, inputs)
+
+  game.turn = turn
+  game.turns = [turn]
   game.players = state.players
-  game.turn = state.turn
-  if (turnIndex < game.turns.length) game.turns = []
-  game.turns[turnIndex] = state.turn
+  console.log(game.players)
+
+  clearInterval(intervalId)
+  intervalId = setInterval(() => {
+    game.tick()
+  }, 300)
+})
+
+socket.on('changeDir', (socketId, dir, turnIndex) => {
+  console.log(socketId)
+  game.onChangeDir({ id: socketId }, dir, turnIndex)
 })
 
 const edge = 10

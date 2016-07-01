@@ -15,9 +15,7 @@ class Game {
   }
 
   canGameStart () {
-    const connected = this.sockets.filter(socket => {
-      return socket
-    })
+    const connected = Object.keys(this.players)
     return connected.length > 1
   }
 
@@ -31,6 +29,11 @@ class Game {
   }
 
   onChangeDir (socket, dir, turnIndex) {
+    const emitterId = socket.id
+    if (typeof window === 'undefined') {
+      this.sockets.forEach(socket => socket && socket.emit('changeDir', emitterId, dir, turnIndex))
+    }
+
     if (turnIndex == null) turnIndex = this.turns.length - 1
     const bikeId = this.players[socket.id]
 
@@ -64,7 +67,6 @@ class Game {
       let nextTurn
 
       if (aliveBikes.length < 2) {
-        console.log('new game!')
         nextTurn = new Turn()
         nextTurn.board = this.turn.board.map(row => row.map(cell => 0))
         this.sockets.forEach((socket, i) => {
@@ -82,12 +84,14 @@ class Game {
   }
 
   sendState () {
+    const turnIndex = this.turns.length - 1
+    if (turnIndex !== 0) return
+
     const state = {
       turn: this.turn,
       players: this.players
     }
 
-    const turnIndex = this.turns.length - 1
     this.sockets.forEach((socket) => {
       if (socket) socket.emit('game:state', state, turnIndex)
     })
