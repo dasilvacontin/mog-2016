@@ -4,6 +4,7 @@ const shortid = require('shortid')
 const clone = require('clone')
 
 const { Game } = require('../src/Game.js')
+const { Turn } = require('../src/Turn.js')
 const C = require('../src/constants.js')
 
 function fakeSocket () {
@@ -279,5 +280,53 @@ test('Game :: Restart with less players', (t) => {
   }, 'socket2 should no longer be in players hash')
   t.doesNotThrow(game.tick.bind(game),
     'it should take into account nulls in array')
+  t.end()
+})
+
+test('Game :: change dir for past turn', (t) => {
+  const socket1 = fakeSocket()
+  const socket2 = fakeSocket()
+
+  const game = new Game()
+  const turn = new Turn([
+    [1, 2, 0],
+    [0, 0, 0],
+    [0, 1, 0]
+  ], [
+    {i: 0, j: 0, dir: C.DOWN, alive: true},
+    {i: 0, j: 1, dir: C.DOWN, alive: true}
+  ], [
+    null,
+    null
+  ])
+  game.turn = turn
+  game.turns = [turn]
+
+  game.sockets = [socket1, socket2]
+  game.sockets.forEach((socket, i) => {
+    game.players[socket.id] = i
+  })
+
+  game.tick()
+  game.tick()
+  // socket1 is requesting to change input to C.LEFT
+  // for turn #3, which is index 2 in turns array
+  // (which is also the current turn)
+  game.onChangeDir(socket1, C.LEFT, 2)
+
+  let stateReceived = 0
+  socket1.once('game:state', () => stateReceived++)
+  socket2.once('game:state', () => stateReceived++)
+
+  // socket2 is requesting to change input to C.RIGHT
+  // for turn #2, which is index 1 in turns array
+  game.onChangeDir(socket2, C.RIGHT, 1)
+  t.equal(stateReceived, 2, 'players should have been notified of resimulation')
+  t.equal(game.turn.board[1][2], 2, 'player two should have moved right on turn 2')
+  t.deepEqual(game.turns[1].inputs, [null, C.RIGHT])
+  t.deepEqual(game.turns[2].inputs, [C.LEFT, null])
+  t.equal(game.turn.bikes[1].i, 1, 'bike pos in turn 2 should be (2,1)')
+  t.equal(game.turn.bikes[1].j, 2, 'bike pos in turn 2 should be (2,1)')
+  t.equal(game.turn.bikes[1].alive, true, 'bike should be alive in resimulation')
   t.end()
 })
