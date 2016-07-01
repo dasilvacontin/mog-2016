@@ -15,7 +15,6 @@ socket.on('game:state', (state, turnIndex) => {
   game.turn = turn
   game.turns = [turn]
   game.players = state.players
-  console.log(game.players)
 
   clearInterval(intervalId)
   intervalId = setInterval(() => {
@@ -24,7 +23,10 @@ socket.on('game:state', (state, turnIndex) => {
 })
 
 socket.on('changeDir', (socketId, dir, turnIndex) => {
-  console.log(socketId)
+  // don't apply your own input changes, may cause render flicker when
+  // multiple input changes were sent in the same turn
+
+  if (socketId === `/#${socket.id}`) return
   game.onChangeDir({ id: socketId }, dir, turnIndex)
 })
 
@@ -105,4 +107,3 @@ global.sendMessage = sendMessage
 
 // chat
 const chatContainer = document.getElementById('chatContainer')
-console.log(chatContainer)
