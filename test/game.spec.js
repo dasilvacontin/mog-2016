@@ -252,18 +252,20 @@ test('Game :: Restart with less players', (t) => {
   game.tick()
 
   const { turn, players, sockets } = game
-  const { board, bikes, inputs } = turn
+  const { bikes, inputs } = turn
   t.deepEqual(
-    socket.map(socket => socket && socket.id),
+    sockets.map(socket => socket && socket.id),
     [socket1.id, null, socket3.id],
     'should leave an empty slot in sockets array')
   t.equal(bikes[1], null,
     'should leave empty slot in bikes array')
+  t.equal(inputs.length, 3,
+    'inputs should leave a gap for the missing player')
   t.deepEqual(players, {
     [socket1.id]: 0,
     [socket3.id]: 2
   }, 'socket2 should no longer be in players hash')
-
   t.doesNotThrow(game.tick.bind(game),
     'it should take into account nulls in array')
+  t.end()
 })
