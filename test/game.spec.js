@@ -4,6 +4,7 @@ const shortid = require('shortid')
 const clone = require('clone')
 
 const { Game } = require('../src/Game.js')
+const { Turn } = require('../src/Turn.js')
 const C = require('../src/constants.js')
 
 function fakeSocket () {
@@ -292,8 +293,8 @@ test('Game :: change dir for past turn', (t) => {
     [0, 0, 0],
     [0, 0, 0]
   ], [
-    {i: 0, j:0, dir: C.DOWN, alive: true},
-    {i: 0, j:1, dir: C.DOWN, alive: true}
+    {i: 0, j: 0, dir: C.DOWN, alive: true},
+    {i: 0, j: 1, dir: C.DOWN, alive: true}
   ], [
     null,
     null
@@ -304,7 +305,7 @@ test('Game :: change dir for past turn', (t) => {
   game.tick()
   game.tick()
   game.onChangeDir(socket1, C.LEFT, 2)
-  
+
   let stateReceived = 0
   socket1.once('game:state', () => stateReceived++)
   socket2.once('game:state', () => stateReceived++)
