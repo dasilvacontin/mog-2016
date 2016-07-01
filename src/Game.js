@@ -5,42 +5,50 @@ class Game {
   constructor () {
     this.players = {}
     this.sockets = []
-    this.bikes = []
-    this.inputs = []
-    this.minsize = 3
-    this.maxsize = 8
+    this.turn = new Turn([], [], [])
 
-    this.board = []
+    this.minsize = 5
+    this.maxsize = 15
     this.bsize = (Math.random() * (this.maxsize - this.minsize) + this.minsize) | 0
     for (var i = 0; i < this.bsize; ++i) {
-      this.board[i] = []
-      for (var j = 0; j < this.bsize; ++j) this.board[i][j] = 0
+      this.turn.board[i] = []
+      for (var j = 0; j < this.bsize; ++j) this.turn.board[i][j] = 0
     }
 
-    this.turn = new Turn(this.board, this.bikes, this.inputs)
+    this.turns = [this.turn]
   }
   isCellFree (ci, cj) {
-    return (this.board[ci][cj] === 0)
+    return (this.turn.board[ci][cj] === 0)
+  }
+  sendGameState () {
+    /* send turn to other players */
+    const game = Object.assign({}, this)
+    for (var p = 0; p < this.sockets.length; ++p) {
+      if (this.sockets[p] != null) this.sockets[p].emit('game:state', game)
+    }
   }
   newGame (pid) {
     /* Add to bikes array */
     var bi = (Math.random() * (this.bsize - 1)) | 0
     var bj = (Math.random() * (this.bsize - 1)) | 0
-    const bdir = (Math.random() * 3) | 0
 
     while (!this.isCellFree(bi, bj)) {
       bi = (Math.random() * (this.bsize - 1)) | 0
       bj = (Math.random() * (this.bsize - 1)) | 0
     }
-    this.bikes.push({i: bi, j: bj, dir: bdir, alive: true})
-    this.board[bi][bj] = pid + 1
-    this.inputs.push(null)
+    var bdir = 0
+    const midb = this.bsize / 2 | 0
+    const mbi = midb + bi
+    const mbj = midb + bj
+    if (bi < midb) bdir = C.DOWN  /* UP */
+    else bdir = C.UP  /* DOWN OR MIDDLE */
+    if (bj < midb) bdir = (bdir === C.DOWN && bi < bj) || (bdir === C.UP && bi < mbj) ? bdir : C.RIGHT
+    else bdir = (bdir === C.DOWN && mbi < bj) || (bdir === C.UP && bi < bj) ? C.LEFT : bdir
 
-    // const cboard = this.board.map(row => row.slice())
-    // const cbikes = this.bikes.map(obj => Object.assign({}, obj))
-    // const cinputs = this.inputs.slice()
-
-    return new Turn(this.board, this.bikes, this.inputs)
+    // console.log('pos: size= ' + this.bsize + ' i= ' + bi + ' j= ' + bj + ' dir= ' + bdir)
+    this.turn.bikes.push({i: bi, j: bj, dir: bdir, alive: true})
+    this.turn.board[bi][bj] = pid + 1
+    this.turn.inputs.push(null)
   }
   onPlayerJoin (psocket) {
     /* Search for null */
@@ -52,12 +60,11 @@ class Game {
     this.players[psocket.id] = s
     this.sockets[s] = psocket
 
-    this.turn = this.newGame(s)
-    const game = Object.assign({}, this)
-    /* send turn to other players */
-    for (var p = 0; p < this.sockets.length; ++p) {
-      if (this.sockets[p] != null) this.sockets[p].emit('game:state', game)
+    if (this.turns.length === 1) {
+      this.newGame(s)
     }
+    /* send turn to other players */
+    this.sendGameState()
   }
   onChangeDir (psocket, dir) {
     const pid = this.players[psocket.id]
@@ -68,11 +75,39 @@ class Game {
     delete this.players[psocket.id]
     this.sockets[pid] = null
     this.turn.setInput(pid, C.SELF_DESTRUCT)
-
-    /* send turn to other players */
-    const game = Object.assign({}, this)
+    this.sendGameState()
+  }
+  isGameFinished () {
+    const aliveBikes = this.turn.bikes.filter(obj => obj == null || obj.alive)
+    return aliveBikes.length <= 1
+  }
+  finishGame () {
+    this.turn = new Turn([], [], [])
+    this.turns = [this.turn]
+    for (var i = 0; i < this.bsize; ++i) {
+      console.log('wat')
+      this.turn.board[i] = []
+      for (var j = 0; j < this.bsize; ++j) this.turn.board[i][j] = 0
+    }
     for (var p = 0; p < this.sockets.length; ++p) {
-      if (this.sockets[p] != null) this.sockets[p].emit('game:state', game)
+      if (this.sockets[p] == null) {
+        this.turn.bikes.push(null)
+        this.turn.inputs.push(null)
+      } else {
+        this.newGame(p)
+      }
+    }
+    this.sendGameState()
+  }
+  tick () {
+    if (this.turn.bikes.length > 1) {
+      if (this.isGameFinished()) {
+        this.finishGame()
+      } else {
+        this.turn = this.turn.evolve()
+        this.turns.push(this.turn)
+        this.sendGameState()
+      }
     }
   }
 }
