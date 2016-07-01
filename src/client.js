@@ -4,6 +4,7 @@ const { Game } = require('./Game.js')
 const { Turn } = require('./Turn.js')
 const C = require('./constants.js')
 
+let debugEnabled = false
 let debugTurn = null
 const game = new Game()
 const socket = io()
@@ -79,7 +80,8 @@ function loop () {
       ctx.fillStyle = color
       ctx.fillRect(j * (edge + offset), i * (edge + offset), edge, edge)
 
-      if (!debugTurn) continue
+      if (!debugTurn || !debugEnabled) continue
+
       const debugCell = debugTurn.board[i][j]
       const debugColor = colors[debugCell]
       ctx.fillStyle = debugColor
@@ -129,7 +131,10 @@ function sendMessage () {
   chatInput.value = ''
   if (content.length === 0) return
 
-  console.log('input', chatInput.value)
+  if (content === '/debug on') debugEnabled = true
+  else debugEnabled = false
+  console.log('debugEnabled', debugEnabled)
+
   socket.emit('chatMessage', content)
 
   const messageDOM = document.createElement('p')
