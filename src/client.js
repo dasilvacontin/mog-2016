@@ -40,7 +40,7 @@ socket.on('game:state', (state, turnIndex) => {
   game.turns = [turn]
   game.players = state.players
   game.interval = state.interval
-  game.lastTurn = Date.now() - ping
+  game.lastTurn = state.timestamp + clientLead
 })
 
 socket.on('changeDir', (socketId, dir, turnIndex) => {

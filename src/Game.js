@@ -110,7 +110,8 @@ class Game {
     const state = {
       turn: this.turn,
       players: this.players,
-      interval: this.interval
+      interval: this.interval,
+      timestamp: Date.now()
     }
 
     this.sockets.forEach((socket) => {
