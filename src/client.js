@@ -7,7 +7,6 @@ const C = require('./constants.js')
 let debugTurn = null
 const game = new Game()
 const socket = io()
-let intervalId
 
 let sentPing
 let ping = ''
@@ -38,12 +37,7 @@ socket.on('game:state', (state, turnIndex) => {
   game.turns = [turn]
   game.players = state.players
   game.interval = state.interval
-
-  clearInterval(intervalId)
-  setTimeout(() => {
-    intervalId = setInterval(game.tick.bind(game), game.interval)
-    game.tick()
-  }, game.interval - ping)
+  game.lastTurn = Date.now() - ping
 })
 
 socket.on('changeDir', (socketId, dir, turnIndex) => {
@@ -63,9 +57,15 @@ const ctx = myCanvas.getContext('2d')
 
 const colors = ['black', 'red', 'blue', 'cyan', 'purple', 'yellow', 'orange', 'green', 'pink', 'grey', 'teal', 'brown']
 
-requestAnimationFrame(renderGame)
-function renderGame () {
-  requestAnimationFrame(renderGame)
+requestAnimationFrame(loop)
+function loop () {
+  requestAnimationFrame(loop)
+
+  const now = Date.now()
+  while (now - game.lastTurn >= game.interval) {
+    game.tick()
+    game.lastTurn += game.interval
+  }
 
   const turn = game.turn
   for (let i = 0; i < turn.board.length; ++i) {
@@ -80,7 +80,7 @@ function renderGame () {
       const debugCell = debugTurn.board[i][j]
       const debugColor = colors[debugCell]
       ctx.fillStyle = debugColor
-      ctx.fillRect(j * (edge + offset), i * (edge + offset), edge/ 2, edge / 2)
+      ctx.fillRect(j * (edge + offset), i * (edge + offset), edge / 2, edge / 2)
     }
   }
 }

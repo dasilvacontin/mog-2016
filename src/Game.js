@@ -9,12 +9,25 @@ class Game {
     this.players = {}
     this.sockets = []
     this.interval = interval
+    this.tickAndSchedule = this.tickAndSchedule.bind(this)
   }
 
   startInterval () {
-    setInterval(() => {
+    this.lastTurn = Date.now()
+    setTimeout(this.tickAndSchedule, this.interval)
+  }
+
+  tickAndSchedule () {
+    let now = Date.now()
+
+    while (now - this.lastTurn >= this.interval) {
+      this.lastTurn += this.interval
       this.tick()
-    }, this.interval)
+      now = Date.now()
+    }
+
+    setTimeout(this.tickAndSchedule,
+      this.lastTurn + this.interval - now)
   }
 
   hasStarted () {
