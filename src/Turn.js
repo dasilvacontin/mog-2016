@@ -147,9 +147,7 @@ class Turn {
       i = Math.floor(Math.random() * height)
       j = Math.floor(Math.random() * width)
     }
-
-    let dir = this.dirForPos(i, j)
-    dir = Math.floor(Math.random() * 4)
+    const dir = this.dirForPos(i, j)
 
     const bike = { i, j, dir, alive: true }
     this.bikes[bikeId] = bike
