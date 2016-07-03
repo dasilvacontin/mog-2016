@@ -8,9 +8,27 @@
       padding: 0;
       overflow:hidden;
     }
+
+    #myCanvas {
+      background:#f2f2f2;
+      border:1px solid #f2f2f2;
+      margin:40px;
+    }
+
+    resources {
+      display:none
+    }
   </style>
 </head>
 <body>
-  <canvas id="myCanvas"></canvas>
+  <canvas id="myCanvas" width="500" height="500"></canvas>
+  <resources class="images">
+    <img id="trailVertical" src="imgs/trail_horizontal.png">
+    <img id="trailHorizontal" src="imgs/trail_vertical.png">
+    <img id="trailCornerTl" src="imgs/trail_corner_tl.png">
+    <img id="trailCornerTr" src="imgs/trail_corner_tr.png">
+    <img id="trailCornerBl" src="imgs/trail_corner_bl.png">
+    <img id="trailCornerBr" src="imgs/trail_corner_br.png">
+  </resources>
   <script src="bundle.js"></script>
 </body>

@@ -12,23 +12,29 @@ class Game {
 
   tick () {
     if (this.turn.bikes.length > 1) {
-      if (this.turn.bikes.filter(bike => bike.alive).length < 2) {
+      if (this.turn.bikes.filter(bike => bike && bike.alive).length < 2) {
         this.restartGame()
-        return
+      } else {
+        const nextTurn = this.turn.evolve()
+        this.turns.push(nextTurn)
+        this.turn = nextTurn
+        this.sendState()
       }
-      const nextTurn = this.turn.evolve()
-      this.turns.push(nextTurn)
-      this.turn = nextTurn
-      this.sockets.forEach(s => { s && s.emit('game:state', { players: this.players, turn: this.turn }) })
     }
   }
 
   restartGame () {
-    const size = this.turn.board.length
-    var board = Array.apply(null, {length: size}).map(value => Array.apply(null, {length: size}).map(value => 0))
+    var board = this.turn.board.map(row => row.map(cell => 0))
     this.turn = new Turn(board, [], [])
     this.turns = [this.turn]
-    this.sockets.forEach(socket => socket && this.turn.addBike(this.players[socket.id]))
+    this.sockets.forEach((socket, i) => {
+      if (socket) this.turn.addBike(i)
+      else this.turn.bikes[i] = null
+    })
+  }
+
+  sendState () {
+    this.sockets.forEach(s => { s && s.emit('game:state', { players: this.players, turn: this.turn }, this.turns.length - 1) })
   }
 
   onPlayerJoin (socket) {
@@ -37,16 +43,28 @@ class Game {
     this.sockets[bikeId] = socket
     this.players[socket.id] = bikeId
     if (this.turns.length < 2) this.turn.addBike(bikeId)
-    this.sockets.forEach(s => { s && s.emit('game:state', { players: this.players, turn: this.turn }) })
+    this.sendState()
   }
 
-  onChangeDir (socket, dir) {
-    this.turn.setInput(this.players[socket.id], dir)
+  onChangeDir (socket, dir, turn) {
+    if (turn == null || turn >= this.turns.length - 1) turn = this.turns.length - 1
+    this.turns[turn].setInput(this.players[socket.id], dir)
+    let crrTurn = this.turns[turn]
+    for (let i = turn + 1; i < this.turns.length; ++i) {
+      let nextTurn = this.turns[i]
+      const nextInput = nextTurn.inputs
+      nextTurn = crrTurn.evolve()
+      nextTurn.inputs = nextInput
+      this.turns[i] = nextTurn
+      crrTurn = nextTurn
+    }
+    this.turn = crrTurn
   }
 
   onPlayerLeave (socket) {
     this.sockets[this.players[socket.id]] = null
     this.turn.setInput(this.players[socket.id], C.SELF_DESTRUCT)
+    if (this.turns.length < 2) this.turn = this.turn.evolve()
     delete this.players[socket.id]
   }
 }

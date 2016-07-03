@@ -2,9 +2,9 @@
 const C = require('./constants.js')
 
 class Turn {
-  constructor (board, bikes, inputs) {
+  constructor (board, bikes = [], inputs = []) {
     this.board = board.map(row => row.slice())
-    this.bikes = bikes.map(bike => Object.assign({}, bike))
+    this.bikes = bikes.map(bike => bike && Object.assign({}, bike))
     this.inputs = inputs
   }
 
@@ -14,7 +14,7 @@ class Turn {
 
   evolve () {
     var tempBoard = this.board.map(row => row.slice())
-    var tempBikes = this.bikes.map(bike => Object.assign({}, bike))
+    var tempBikes = this.bikes.map(bike => bike && Object.assign({}, bike))
     const collisions = {}
     for (let i = 0; i < tempBikes.length; ++i) {
       const bike = tempBikes[i]
@@ -44,8 +44,8 @@ class Turn {
 
     for (let i = 0; i < tempBikes.length; i++) {
       const bike = tempBikes[i]
-      if (!bike) continue
       const oldBike = this.bikes[i]
+      if (!bike) continue
       if (bike.alive && collisions[bike.i + 'x' + bike.j].length > 1) {
         bike.alive = false
       }
@@ -60,10 +60,36 @@ class Turn {
   }
 
   addBike (bikeId) {
+    if (bikeId === -1) {
+      this.bikes[bikeId] = null
+      this.inputs[bikeId] = null
+    }
     var initPos = getRandomEmptyPosition(this.board)
-    this.bikes[bikeId] = { i: initPos.i, j: initPos.j, dir: getRandomInt(0, 3), alive: true }
+    var dir = this.dirForPos(initPos.i, initPos.j)
+    this.bikes[bikeId] = { i: initPos.i, j: initPos.j, dir: dir, alive: true }
     this.board[initPos.i][initPos.j] = bikeId + 1
     this.inputs[bikeId] = null
+  }
+
+  dirForPos (i, j) {
+    const width = this.board[0].length
+    const height = this.board.length
+
+    // get minimum distance to board border for each axis
+    const ci = Math.min(i + 1, height - i)
+    const cj = Math.min(j + 1, width - j)
+
+    let dir
+    if (ci < cj) {
+      // i is closer to edge
+      if (i < height / 2) dir = C.DOWN
+      else dir = C.UP
+    } else {
+      // j is closer to edge
+      if (j < width / 2) dir = C.RIGHT
+      else dir = C.LEFT
+    }
+    return dir
   }
 }
 exports.Turn = Turn
