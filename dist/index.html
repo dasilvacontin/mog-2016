@@ -7,12 +7,39 @@
       margin: 0;
       padding: 0;
       overflow:hidden;
+      font-family: helvetica, verdana;
+      background: #4CA1AF; /* fallback for old browsers */
+      background: -webkit-linear-gradient(to left, #4CA1AF , #C4E0E5); /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to left, #4CA1AF , #C4E0E5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    main {
+        width:100%;
+        float:left;
+        position:relative;
+        text-align:center;
+    }
+
+    h1 {
+      color:#252523;
+      text-shadow:1px 1px #666;
     }
 
     #myCanvas {
-      background:#f2f2f2;
-      border:1px solid #f2f2f2;
-      margin:40px;
+      margin:40px auto;
+      position:relative;
+      display:block;
+    }
+
+    #playerColor{
+      padding:5px;
+      border-radius:8px;
+      color:#f2f2f2;
+      text-shadow:1px 1px #666;
+      background-color:#232325;
+      width:80px;
+      display:block;
+      margin:0 auto;
     }
 
     resources {
@@ -21,14 +48,18 @@
   </style>
 </head>
 <body>
-  <canvas id="myCanvas" width="500" height="500"></canvas>
-  <resources class="images">
-    <img id="trailVertical" src="imgs/trail_horizontal.png">
-    <img id="trailHorizontal" src="imgs/trail_vertical.png">
-    <img id="trailCornerTl" src="imgs/trail_corner_tl.png">
-    <img id="trailCornerTr" src="imgs/trail_corner_tr.png">
-    <img id="trailCornerBl" src="imgs/trail_corner_bl.png">
-    <img id="trailCornerBr" src="imgs/trail_corner_br.png">
-  </resources>
+  <main>
+    <h1>Elendow Tron</h1>
+    <canvas id="myCanvas" width="450" height="450"></canvas>
+    <p id="playerColor">You</p>
+    <resources class="images">
+      <img id="trailVertical" src="imgs/trail_horizontal.png">
+      <img id="trailHorizontal" src="imgs/trail_vertical.png">
+      <img id="trailCornerTl" src="imgs/trail_corner_tl.png">
+      <img id="trailCornerTr" src="imgs/trail_corner_tr.png">
+      <img id="trailCornerBl" src="imgs/trail_corner_bl.png">
+      <img id="trailCornerBr" src="imgs/trail_corner_br.png">
+    </resources>
+  </main>
   <script src="bundle.js"></script>
 </body>

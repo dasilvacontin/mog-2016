@@ -31,6 +31,7 @@ class Game {
       if (socket) this.turn.addBike(i)
       else this.turn.bikes[i] = null
     })
+    this.sendState()
   }
 
   sendState () {
