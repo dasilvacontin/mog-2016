@@ -14,6 +14,8 @@ socket.on('game:state', (state, turnIndex) => {
   prevTurn = turnIndex - 1
   let bikeId = game.players['/#' + socket.id] + 1
   if (bikeId) playerColor.style.backgroundColor = colors[bikeId].hex
+  if (game.turn.bikes.length < 2) waitingPlayers.innerHTML = 'Waiting for players...'
+  else waitingPlayers.innerHTML = ''
 })
 
 const myCanvas = document.getElementById('myCanvas')
@@ -28,6 +30,7 @@ const colors = [C.BLACK, C.RED, C.BLUE, C.CYAN, C.PURPLE, C.YELLOW, C.ORANGE, C.
 const offset = 1
 const edge = 14
 const playerColor = document.getElementById('playerColor')
+const waitingPlayers = document.getElementById('waitingForPlayers')
 const trailH = document.getElementById('trailHorizontal')
 const trailV = document.getElementById('trailVertical')
 const trailCornerTl = document.getElementById('trailCornerTl')

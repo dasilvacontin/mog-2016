@@ -8,9 +8,8 @@
       padding: 0;
       overflow:hidden;
       font-family: helvetica, verdana;
-      background: #4CA1AF; /* fallback for old browsers */
-      background: -webkit-linear-gradient(to left, #4CA1AF , #C4E0E5); /* Chrome 10-25, Safari 5.1-6 */
-      background: linear-gradient(to left, #4CA1AF , #C4E0E5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      background: #f2f2f2;
+      font-variant: small-caps;
     }
 
     main {
@@ -22,11 +21,10 @@
 
     h1 {
       color:#252523;
-      text-shadow:1px 1px #666;
     }
 
     #myCanvas {
-      margin:40px auto;
+      margin:20px auto;
       position:relative;
       display:block;
     }
@@ -35,11 +33,17 @@
       padding:5px;
       border-radius:8px;
       color:#f2f2f2;
-      text-shadow:1px 1px #666;
       background-color:#232325;
       width:80px;
       display:block;
       margin:0 auto;
+    }
+
+    #waitingForPlayers{
+      height:15px;
+      line-height: 15px;
+      padding:0;
+      margin:0;
     }
 
     resources {
@@ -50,6 +54,7 @@
 <body>
   <main>
     <h1>Elendow Tron</h1>
+    <p id="waitingForPlayers">Waiting more players...</p>
     <canvas id="myCanvas" width="450" height="450"></canvas>
     <p id="playerColor">You</p>
     <resources class="images">
