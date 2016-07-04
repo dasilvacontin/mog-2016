@@ -14,7 +14,7 @@ socket.on('game:state', (state, turnIndex) => {
   prevTurn = turnIndex - 1
   let bikeId = game.players['/#' + socket.id] + 1
   if (bikeId) playerColor.style.backgroundColor = colors[bikeId].hex
-  if (game.turn.bikes.length < 2) waitingPlayers.innerHTML = 'Waiting for players...'
+  if (game.turn.bikes.filter(bike => bike).length < 2) waitingPlayers.innerHTML = 'Waiting for players...'
   else waitingPlayers.innerHTML = ''
 })
 
