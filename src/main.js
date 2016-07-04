@@ -6,11 +6,20 @@ const socket = io()
 const {Game} = require('./Game.js')
 
 var interval
+var size = 10
+const offsetFactor = 1
+var edge = Math.min(window.innerWidth, window.innerHeight) / (size * offsetFactor)
+const ctx = myCanvas.getContext('2d')
 
 var game = new Game()
 
 function onGameState (g) {
   game = g
+  let size2 = game.turn.board.length
+  if (size !== size2) {
+    size = size2
+    edge = Math.min(window.innerWidth, window.innerHeight) / (size * offsetFactor)
+  }
 }
 
 function onInterval (i) {
@@ -31,11 +40,6 @@ const C = require('./constants.js')
 
 myCanvas.width = window.innerWidth
 myCanvas.height = window.innerHeight
-
-const size = 50
-const offsetFactor = 1
-const edge = Math.min(window.innerWidth, window.innerHeight) / (size * offsetFactor)
-const ctx = myCanvas.getContext('2d')
 
 let matrix = Array(size).fill().map(() => Array(size).fill().map(() => 0))
 matrix[0][0] = 1

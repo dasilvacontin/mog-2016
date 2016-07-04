@@ -18,7 +18,7 @@ class Turn {
     let nextPositions = {}
     for (let i = 0; i < this.bikes.length; i++) {
       const bike = nt.bikes[i]
-      if (bike.alive === false) continue
+      if (bike == null || bike.alive === false) continue
 
       let direction = this.inputs[i]
       nt.inputs[i] = null
@@ -71,6 +71,7 @@ class Turn {
     // Cleaning dead bikes and moving alive bikes
 
     nt.bikes.forEach((bike, i) => {
+      if (bike == null) return
       if (!bike.alive) {
         cleanBoard(nt.board, i + 1, this.bikes[i].i, this.bikes[i].j)
       } else {
@@ -85,6 +86,26 @@ class Turn {
     //   }
     // }
     return nt
+  }
+
+  dirForPos (i, j) {
+    let dir = []
+    dir[RIGHT] = j
+    dir[UP] = this.board.length - i - 1
+    dir[LEFT] = this.board[0].length - j - 1
+    dir[DOWN] = i
+
+    let min = this.board.length + this.board[0].length
+    let pos = -1
+
+    dir.forEach((dist, i) => {
+      if (dist < min) {
+        min = dist
+        pos = i
+      }
+    })
+
+    return pos
   }
 }
 

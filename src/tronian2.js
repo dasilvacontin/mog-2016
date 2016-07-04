@@ -1,12 +1,14 @@
 const io = require('socket.io-client')
-const SERVER_IP = 'http://localhost:5000'
-// const SERVER_IP = 'http://mog2016-tron.herokuapp.com/'
+// const SERVER_IP = 'http://localhost:5000'
+const SERVER_IP = 'http://mog2016-tron.herokuapp.com/'
 // const SERVER_IP = 'https://lit-waters-26157.herokuapp.com/'
 var socket = io(SERVER_IP)
 const C = require('./constants')
-// const {Game} = require('./Game.js')
-
-var following = false
+const {Game} = require('./Game.js')
+const {Turn} = require('./Turn.js')
+const game = new Game()
+let intervalId
+var following = true
 
 const IncForDir = {
   [C.RIGHT]: {i: 0, j: 1},
@@ -50,7 +52,28 @@ function sizeOfLand (board, i, j, visited) {
   }
 }
 
-function onGameState (game) {
+function onGameState (state, turnIndex) {
+  const { board, bikes, inputs } = state.turn
+  const turn = new Turn(board, bikes, inputs)
+
+  game.turn = turn
+  game.turns = [turn]
+  game.players = state.players
+  game.nTurn = turnIndex
+
+  socket.emit('changeDir', C.UP, 1)
+
+  // game.tick()
+  // game.tick()
+
+  clearInterval(intervalId)
+  intervalId = setInterval(() => {
+    simulate()
+    game.tick()
+  }, state.interval)
+}
+
+function simulate () {
   let myId = game.players['/#' + this.id]
   if (myId == null) {
     following = false
@@ -63,7 +86,7 @@ function onGameState (game) {
   }
   if (!bike.alive) {
     console.log('ha muerto... waiting')
-    following = false
+    // following = false
     return
   }
   if (bike.i == null || bike.j == null) return
@@ -90,7 +113,13 @@ function onGameState (game) {
   // console.log(bike, myDir)
 }
 
+function onChangeDir (socketId, dir, turnIndex) {
+  if (socketId === `/#${socket.id}`) return
+  game.onChangeDir({ id: socketId }, dir, turnIndex)
+}
+
 socket.on('connect', () => {
   socket.on('game:state', onGameState)
   console.log('connected')
+  socket.on('changeDir', onChangeDir)
 })

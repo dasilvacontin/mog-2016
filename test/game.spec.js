@@ -308,6 +308,7 @@ test('Game :: change dir for past turn', (t) => {
   })
 
   game.tick()
+  console.log(game.turn.board)
   game.tick()
   // socket1 is requesting to change input to C.LEFT
   // for turn #3, which is index 2 in turns array

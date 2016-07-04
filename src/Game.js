@@ -3,7 +3,7 @@ const C = require('./constants.js')
 
 class Game {
   constructor () {
-    this.size = 50
+    this.size = 100
     let matrix = Array(this.size).fill().map(() => Array(this.size).fill().map(() => 0))
     this.turn = new Turn(matrix, [], [])
     this.players = {}
@@ -11,15 +11,18 @@ class Game {
     this.currentTurn = 0
     this.turns = []
     this.turns[this.currentTurn] = this.turn
-    this.running = false
+    this.running = true
   }
 
   restartGame () {
     this.turn.board = Array(this.size).fill().map(() => Array(this.size).fill().map(() => 0))
-    let i = 0
+    let i = -1
     this.sockets.forEach((s) => {
-      if (s == null) return
       i += 1
+      if (s == null) {
+        this.turn.bikes[i] = null
+        return
+      }
       let pos = this.players[s.id]
       // if (!(this.turn.bikes[pos]) || !this.turn.bikes[pos].alive) {
       let x = Math.floor(Math.random() * (this.turn.board[0].length - 1))
@@ -85,9 +88,11 @@ class Game {
         console.log('el turno que ha pedido no existe')
         return
       }
+      if (auxTurn.inputs[this.players[socket.id]] === dir) return
       auxTurn.setInput(this.players[socket.id], dir)
       for (let i = nTurn + 1; i <= this.currentTurn; ++i) {
         auxTurn = auxTurn.evolve()
+        console.log(this.turns[i], i)
         auxTurn.inputs = this.turns[i].inputs
         this.turns[i] = auxTurn
       }
@@ -99,14 +104,16 @@ class Game {
   }
 
   tick () {
-    if (this.turn.bikes.filter((b) => b.alive).length <= 1) {
+    if (this.turn.bikes.filter(
+      (b) => { if (b === null) return false; else return b.alive })
+      .length <= 1) {
       if (this.running) this.restartGame()
       return
     } else if (!this.running) this.restartGame()
     this.turn = this.turn.evolve()
     this.currentTurn += 1
-    this.sendState()
     this.turns[this.currentTurn] = this.turn
+    this.sendState()
     // delete this.turns[this.currentTurn - 200]
   }
 

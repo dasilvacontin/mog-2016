@@ -5,7 +5,7 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 const {Game} = require('../src/Game.js')
 
-const interval = 200
+const interval = 10
 
 app.use(express.static('dist'))
 app.get('/', function (req, res) {
