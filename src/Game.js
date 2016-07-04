@@ -66,9 +66,24 @@ class Game {
     /* send turn to other players */
     this.sendGameState()
   }
-  onChangeDir (psocket, dir) {
+  redoTurns (num) {
+    for (var i = num; i < this.turns.length - 1; ++i) {
+      const newTurn = this.turns[i].evolve()
+      const oldInput = this.turns[i + 1].inputs.slice()
+      newTurn.inputs = oldInput
+      this.turns[i + 1] = newTurn
+    }
+    this.turn = this.turns[this.turns.length - 1]
+    this.sendGameState()
+  }
+  onChangeDir (psocket, dir, num = -1) {
     const pid = this.players[psocket.id]
-    this.turn.setInput(pid, dir)
+    if (num === -1 || num === this.turns.length - 1) {
+      this.turn.setInput(pid, dir)
+    } else {
+      this.turns[num].setInput(pid, dir)
+      this.redoTurns(num)
+    }
   }
   onPlayerLeave (psocket) {
     const pid = this.players[psocket.id]
@@ -85,7 +100,6 @@ class Game {
     this.turn = new Turn([], [], [])
     this.turns = [this.turn]
     for (var i = 0; i < this.bsize; ++i) {
-      console.log('wat')
       this.turn.board[i] = []
       for (var j = 0; j < this.bsize; ++j) this.turn.board[i][j] = 0
     }

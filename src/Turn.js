@@ -1,6 +1,6 @@
 const C = require('../src/constants.js')
 class Turn {
-  constructor (board, bikes, inputs) {
+  constructor (board = [], bikes = [], inputs = []) {
     this.board = board
     this.newboard = []
     this.bikes = bikes
@@ -10,6 +10,19 @@ class Turn {
   }
   setInput (num, dir) {
     this.inputs[num] = dir
+  }
+  dirForPos (bi, bj) {
+    this.blength = this.board[0].length
+    var bdir = 0
+    const midb = this.blength / 2 | 0
+    const mbi = midb + bi
+    const mbj = midb + bj
+    if (bi <= midb) bdir = C.DOWN  /* UP OR MIDDLE */
+    else bdir = C.UP  /* DOWN */
+    // console.log('bi = ' + bi + ' bj = ' + bj + ' midb = ' + midb)
+    if (bj <= midb) bdir = (bdir === C.DOWN && bi <= bj) || (bdir === C.UP && bi <= mbj) ? bdir : C.RIGHT
+    else bdir = (bdir === C.DOWN && mbi <= bj) || (bdir === C.UP && bi <= bj) ? C.LEFT : bdir
+    return bdir
   }
   isNotOppositeDirection (dir1, dir2) {
     return (dir1 + dir2 !== C.UP + C.DOWN) && (dir1 + dir2 !== C.RIGHT + C.LEFT)
