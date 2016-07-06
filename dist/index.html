@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow:hidden;
+      font-family: helvetica, verdana;
+      background: #f2f2f2;
+      font-variant: small-caps;
+    }
+
+    main {
+        width:100%;
+        float:left;
+        position:relative;
+        text-align:center;
+    }
+
+    h1 {
+      color:#252523;
+    }
+
+    #myCanvas {
+      margin:20px auto;
+      position:relative;
+      display:block;
+    }
+
+    #playerColor{
+      padding:5px;
+      border-radius:8px;
+      color:#f2f2f2;
+      background-color:#232325;
+      width:80px;
+      display:block;
+      margin:0 auto;
+    }
+
+    #waitingForPlayers{
+      height:15px;
+      line-height: 15px;
+      padding:0;
+      margin:0;
+    }
+
+    resources {
+      display:none
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Elendow Tron</h1>
+    <p id="waitingForPlayers">Waiting for players...</p>
+    <canvas id="myCanvas" width="450" height="450"></canvas>
+    <p id="playerColor">You</p>
+    <resources class="images">
+      <img id="trailVertical" src="imgs/trail_horizontal.png">
+      <img id="trailHorizontal" src="imgs/trail_vertical.png">
+      <img id="trailCornerTl" src="imgs/trail_corner_tl.png">
+      <img id="trailCornerTr" src="imgs/trail_corner_tr.png">
+      <img id="trailCornerBl" src="imgs/trail_corner_bl.png">
+      <img id="trailCornerBr" src="imgs/trail_corner_br.png">
+    </resources>
+  </main>
+  <script src="bundle.js"></script>
+</body>
